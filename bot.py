@@ -26,12 +26,12 @@ bot.load_extension('jishaku')
 if not os.path.exists('counters.json'):
     os.mknod('counters.json')
     with open('counters.json', 'a') as f:
-        f.write('{"Ah": 0, "Bruh": 0, ";P": 0, "Oof": 0, "Oh": 0, "Sims": 0, "Pog": 0}')
+        f.write('{"Ah": {"regex": "ah","display": "Ah","count": 0}')
 
 if not os.path.exists('devcounters.json'):
     os.mknod('devcounters.json')
     with open('devcounters.json', 'a') as f:
-        f.write('{"Ah": 0, "Bruh": 0, ";P": 0, "Oof": 0, "Oh": 0, "Sims": 0, "Pog": 0}')
+        f.write('{"Ah": {"regex": "ah","display": "Ah","count": 0}')
 
 @bot.event
 async def on_command_error(ctx, error):
