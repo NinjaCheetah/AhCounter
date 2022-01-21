@@ -1,22 +1,23 @@
 # bot.py
 import os
-import random
-from dotenv import load_dotenv
+
 import discord
 from discord.ext import commands
-import io
-import re
-from discord.utils import get
-import json
+from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
-bot = commands.Bot(command_prefix='$')
+class Bot(commands.Bot):
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
 
-client = discord.Client
+    async def process_commands(self, message: discord.Message):
+        ctx = await self.get_context(message)
+        await self.invoke(ctx)
 
+bot = Bot(command_prefix='$', activity=discord.Game(name="Counting Ahs", type=3))
 bot.remove_command('help')
 
 startup_extensions = ["cogs.counter", "cogs.help", "cogs.management"]
@@ -88,17 +89,6 @@ async def reloadall(ctx):
 @bot.event
 async def on_ready():
     print('Ready.')
-    activity = discord.Game(name="Counting Ahs", type=3)
-    await bot.change_presence(activity=activity)
-
-def load_counters(self):
-        with open('counters.json', 'r') as f:
-            counters = json.load(f)
-        return counters
-
-def save_counters(self, counters):
-    with open('counters.json', 'w') as f:
-        json.dump(counters, f)
 
 if __name__ == "__main__":
     for extension in startup_extensions:
