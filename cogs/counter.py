@@ -1,13 +1,18 @@
 # counter.py
+import os
 import discord
 from discord.ext import commands
 import discord.utils
 import json
 import re
 import time
+from dotenv import load_dotenv
 
 milestones = [10,25,50,75,100,150,200,300,400,500,1000,1500,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 sleepusers = [327757456673472523, 644449298087411732]
+
+load_dotenv()
+MILESTONE_CHANNEL = os.getenv('MILESTONE_CHANNEL')
 
 def load_counters():
     with open('counters.json', 'r') as f:
@@ -55,7 +60,7 @@ class Message_Counter(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        channel = self.client.get_channel(620406977490714626)
+        channel = self.client.get_channel(MILESTONE_CHANNEL)
         if message.guild != None:
             if re.findall("\\bah+\\b", message.content, re.IGNORECASE):
                 counters = load_counters()
