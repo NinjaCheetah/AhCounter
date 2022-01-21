@@ -27,27 +27,6 @@ class Message_Counter(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(name='ahcount', help='Displays the current number of Ahs')
-    async def ahcount(self, message):
-        counters = load_counters()
-        await message.channel.send("Ah Count: "+str(counters["Ah"]))
-    @commands.command(name='bruhcount', help='Displays the current number of Bruhs')
-    async def bruhcount(self, message):
-        counters = load_counters()
-        await message.channel.send("Bruh Count: "+str(counters["Bruh"]))
-    @commands.command(name='oofcount', help='Displays the current number of Oofs')
-    async def oofcount(self, message):
-        counters = load_counters()
-        await message.channel.send("Oof Count: "+str(counters["Oof"]))
-    @commands.command(name='tonguecount', help='Displays the current number of ;Ps')
-    async def tonguecount(self, message):
-        counters = load_counters()
-        await message.channel.send(";P Count: "+str(counters[";P"]))
-    @commands.command(name='ohcount', help='Displays the current number of Ohs')
-    async def ohcount(self, message):
-        counters = load_counters()
-        await message.channel.send("Oh Count: "+str(counters["Oh"]))
-
     @commands.command(name='count', help='Displays the counts from all word counters.')
     async def countall(self, message):
         counters = load_counters()

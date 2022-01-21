@@ -27,10 +27,10 @@ class Help(commands.Cog):
         embed.set_footer(text="Prefix is `$`")
         await ctx.send(embed=embed)
 
-    @commands.group(name='secrethelp', help='Shows this message', invoke_without_command=True)
+    @commands.group(name='ownerhelp', help='Shows this message', invoke_without_command=True)
     async def secrethelp(self, ctx):
         embed=discord.Embed(title="Owner-Only Management Commands", color=0xff0000)
-        embed.set_author(name="Secret Help")
+        embed.set_author(name="Owner Help")
         embed.add_field(name="status", value="Use `$status set <message>` to set a status or `$status random` to pick a random one", inline=False)
         embed.add_field(name="load", value="Loads a cog", inline=True)
         embed.add_field(name="unload", value="Unloads a cog", inline=True)
