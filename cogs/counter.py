@@ -10,7 +10,7 @@ import unidecode
 milestones = [10,25,50,75,100,150,200,300,400,500,1000,1500,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 sleepusers = []
 sleepwords = ["tired", "bed", "rest"]
-SLEEP_REGEX = ".?[sxz]+.?.?[l1|]+.?.?[e3]+.?.?[e3]+.?.?[p].?"
+SLEEP_REGEX = ".?[sxz\u0455]+.?.?[l1|]+.?.?[e3\u0435\u0395]+.?.?[e3\u0435\u0395]+.?.?[p\u0440\u03A1].?"
 
 with open('config.json', 'r') as f:
     try:
@@ -36,8 +36,10 @@ def save_counters(counters):
        json.dump(counters, f, indent=4)
 
 def has_sleep(string):
-    string = unidecode.unidecode(string)
     match = re.search(SLEEP_REGEX, string, flags=re.IGNORECASE)
+    if not match:
+        string = unidecode.unidecode(string)
+        match = re.search(SLEEP_REGEX, string, flags=re.IGNORECASE)
     return match
 
 class Message_Counter(commands.Cog):
