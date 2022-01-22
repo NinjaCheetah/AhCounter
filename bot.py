@@ -1,13 +1,14 @@
 # bot.py
 import os
-
+import json
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
 
-load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
-GUILD = os.getenv('DISCORD_GUILD')
+with open('config.json', 'r') as f:
+    config = json.load(f)
+
+TOKEN = config["TOKEN"]
+# GUILD = config["GUILD"]
 
 class Bot(commands.Bot):
     def __init__(self, **kwargs) -> None:

@@ -1,14 +1,7 @@
-# misc.py
+# help.py
 import os
-import random
-from dotenv import load_dotenv
 import discord
 from discord.ext import commands
-import io
-import re
-import math
-import time
-from discord.utils import get
 
 class Help(commands.Cog):
     """

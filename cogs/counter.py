@@ -6,13 +6,13 @@ import discord.utils
 import json
 import re
 import time
-from dotenv import load_dotenv
 
 milestones = [10,25,50,75,100,150,200,300,400,500,1000,1500,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 sleepusers = [327757456673472523, 644449298087411732]
 
-load_dotenv()
-MILESTONE_CHANNEL = os.getenv('MILESTONE_CHANNEL')
+with open('config.json', 'r') as f:
+    config = json.load(f)
+MILESTONE_CHANNEL = config["MILESTONE_CHANNEL"]
 
 def load_counters():
     with open('counters.json', 'r') as f:

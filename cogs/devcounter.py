@@ -10,6 +10,10 @@ import time
 dev_milestones = [10,25,50,75,100,150,200,300,400,500,1000,1500,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 sleepusers = [327757456673472523, 644449298087411732]
 
+with open('config.json', 'r') as f:
+    config = json.load(f)
+MILESTONE_CHANNEL = config["MILESTONE_CHANNEL"]
+
 def load_devcounters():
     with open('devcounters.json', 'r') as f:
        counters = json.load(f)
@@ -39,7 +43,7 @@ class DevMessage_Counter(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        channel = self.client.get_channel(620406977490714626)
+        channel = self.client.get_channel(MILESTONE_CHANNEL)
         if message.guild != None and message.author.id != 737755242757881937:
             counters = load_devcounters()
             for key in counters:
