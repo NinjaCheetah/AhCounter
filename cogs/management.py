@@ -31,16 +31,16 @@ class Management(commands.Cog):
     async def status(self, ctx):
         await ctx.send(":x: Use `$status set <message>` to set status message, or if you are indecisive then use `$status random`.")
 
-    @status.command(aliases=['Set', 'set'])
+    @status.command(aliases=['Set', 'set', '-s', '-S'])
     @commands.is_owner()
     async def presence_set(self, ctx, *, message):
         activity = discord.Game(name=message, type=3)
         await self.bot.change_presence(activity=activity)
         await ctx.send(":white_check_mark: Set status message to: `" + message + "`")
 
-    @status.command(aliases=['Random', 'random'])
+    @status.command(aliases=['Classic', 'classic', '-c'])
     @commands.is_owner()
-    async def status_random(self, ctx):
+    async def status_random_classic(self, ctx):
         status_list = [
             'Counting Ahs',
             'Counting Bruhs',
@@ -59,11 +59,22 @@ class Management(commands.Cog):
             '🍎->👀();',
             'my status ideas are meeh at 3AM',
         ]
-
         response = random.choice(status_list)
         activity = discord.Game(name=response, type=3)
         await self.bot.change_presence(activity=activity)
         await ctx.send(":white_check_mark: Set status to: `" + response + "`")
+
+    @status.command(aliases=['Random', 'random', '-r'])
+    @commands.is_owner()
+    async def status_random(self, ctx):
+        with open("words.txt", "r") as f:
+            status_word_list = f.readlines()
+        status_string = ""
+        for i in range(3):
+            status_string += str(random.choice(status_word_list)).strip()+" "
+        activity = discord.Game(name=status_string, type=3)
+        await self.bot.change_presence(activity=activity)
+        await ctx.send(":white_check_mark: Set status to: `" + status_string + "`")
 
     @commands.command(name="about")
     async def about(self, ctx):
