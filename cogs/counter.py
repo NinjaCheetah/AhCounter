@@ -5,10 +5,11 @@ from discord.ext import commands
 import discord.utils
 import json
 import re
-import time
+import unidecode
 
 milestones = [10,25,50,75,100,150,200,300,400,500,1000,1500,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 sleepusers = [327757456673472523, 644449298087411732]
+SLEEP_REGEX = ".?[sxz]+.?.?[l1|]+.?.?[e3]+.?.?[e3]+.?.?[p].?"
 
 with open('config.json', 'r') as f:
     config = json.load(f)
@@ -22,6 +23,11 @@ def load_counters():
 def save_counters(counters):
     with open('counters.json', 'w') as f:
        json.dump(counters, f, indent=4)
+
+def has_sleep(string):
+    string = unidecode.unidecode(string)
+    match = re.search(SLEEP_REGEX, string, flags=re.IGNORECASE)
+    return match
 
 class Message_Counter(commands.Cog):
     def __init__(self, client):
@@ -52,7 +58,7 @@ class Message_Counter(commands.Cog):
                     i["count"] += 1
                 save_counters(counters)
             if message.author.id in sleepusers:
-                if re.findall(r"\**_*[s$§ßśŝš5zxｓ*]+\**[l1iIīłïîíìĺł\)\]\}\(\[\{|¡!ｌ*]+\**[e3èé€êēęë&ｅ*]+\**[p¶ｐ*]+_*\**", message.content, re.IGNORECASE):
+                if has_sleep(message.content):
                     await message.add_reaction("🧢")
                 elif re.findall("\\bbed\\b", message.content, re.IGNORECASE):
                     await message.add_reaction("🧢")

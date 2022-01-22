@@ -6,15 +6,6 @@ import re
 import time
 import random
 
-def load_counters():
-    with open('counters.json', 'r') as f:
-       counters = json.load(f)
-    return counters
-
-def save_counters(counters):
-    with open('counters.json', 'w') as f:
-       json.dump(counters, f)
-
 def load_devcounters():
     with open('devcounters.json', 'r') as f:
        devcounters = json.load(f)
@@ -22,7 +13,7 @@ def load_devcounters():
 
 def save_devcounters(devcounters):
     with open('devcounters.json', 'w') as f:
-       json.dump(devcounters, f)
+       json.dump(devcounters, f, indent=4)
 
 class Management(commands.Cog):
     def __init__(self, bot):
@@ -82,7 +73,7 @@ class Management(commands.Cog):
         embed.add_field(name="Creator:", value="NinjaCheetah", inline=False)
         embed.add_field(name=":trophy: Words I count:", value="Ah, Bruh, Oof, Oh, ;P (:P and :winktongue: too)", inline=False)
         embed.add_field(name=":snake: Python version:", value="3.9.9")
-        embed.add_field(name="Bot version:", value="v1.3")
+        embed.add_field(name="Bot version:", value="v1.4")
         await ctx.send(embed=embed)
 
     @commands.command(name='dev', help='Switches the bot into dev mode.')
@@ -91,10 +82,9 @@ class Management(commands.Cog):
         activity = discord.Game(name="Development Mode, Counts Are Not Saved!", type=3)
         await self.bot.change_presence(activity=activity)
         devcounters = load_devcounters()
-        devcounters["Ah"] = 0
-        devcounters["Bruh"] = 0
-        devcounters["Oof"] = 0
-        devcounters[";P"] = 0
+        for key in devcounters:
+            i = devcounters[key]
+            i["count"] = 0
         save_devcounters(devcounters)
         self.bot.unload_extension("cogs.counter")
         self.bot.unload_extension("cogs.help")
