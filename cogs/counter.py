@@ -9,6 +9,7 @@ import unidecode
 
 milestones = [10,25,50,75,100,150,200,300,400,500,1000,1500,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 sleepusers = [327757456673472523, 644449298087411732]
+sleepwords = ["tired", "bed", "rest"]
 SLEEP_REGEX = ".?[sxz]+.?.?[l1|]+.?.?[e3]+.?.?[e3]+.?.?[p].?"
 
 with open('config.json', 'r') as f:
@@ -60,10 +61,10 @@ class Message_Counter(commands.Cog):
             if message.author.id in sleepusers:
                 if has_sleep(message.content):
                     await message.add_reaction("🧢")
-                elif re.findall("\\bbed\\b", message.content, re.IGNORECASE):
-                    await message.add_reaction("🧢")
-                elif re.findall("\\btired\\b", message.content, re.IGNORECASE):
-                    await message.add_reaction("🧢")
+                else:
+                    for i in sleepwords:
+                        if re.findall("\\b"+str(i)"\\b", message.content, re.IGNORECASE):
+                            await message.add_reaction("🧢")
 
 def setup(client):
     client.add_cog(Message_Counter(client))
