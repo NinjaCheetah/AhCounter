@@ -8,13 +8,23 @@ import re
 import unidecode
 
 milestones = [10,25,50,75,100,150,200,300,400,500,1000,1500,2000,3000,4000,5000,6000,7000,8000,9000,10000]
-sleepusers = [327757456673472523, 644449298087411732]
+sleepusers = []
 sleepwords = ["tired", "bed", "rest"]
 SLEEP_REGEX = ".?[sxz]+.?.?[l1|]+.?.?[e3]+.?.?[e3]+.?.?[p].?"
 
 with open('config.json', 'r') as f:
-    config = json.load(f)
+    try:
+        config = json.load(f)
+    except Exception as e:
+        exc = '{}: {}'.format(type(e).__name__, e)
+        print('Error loading config.json: {}'.format( exc))
 MILESTONE_CHANNEL = config["MILESTONE_CHANNEL"]
+try:
+    for key in config["SLEEPUSERS"]:
+        i = config["SLEEPUSERS"][key]
+        sleepusers.append(int(i["ID"]))
+except Exception as e:
+    sleepusers = [0]
 
 def load_counters():
     with open('counters.json', 'r') as f:
@@ -63,7 +73,7 @@ class Message_Counter(commands.Cog):
                     await message.add_reaction("🧢")
                 else:
                     for i in sleepwords:
-                        if re.findall("\\b"+str(i)"\\b", message.content, re.IGNORECASE):
+                        if re.findall("\\b"+str(i)+"\\b", message.content, re.IGNORECASE):
                             await message.add_reaction("🧢")
 
 def setup(client):
