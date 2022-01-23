@@ -1,16 +1,7 @@
 # Ah Counter
 Discord bot that counts "Ah", among other words.
 ## Running
-To run this bot, you'll first need to set up a `config.json` file in the bot's root directory (the one with `bot.py` in it!) with your token and the channel you'd like milestone messages to be sent to. An example file is provided below:
-
-```json
-# config.json
-{
-  "DISCORD_TOKEN": "<bot token>",
-  "MILESTONE_CHANNEL": <Discord channel ID>
-}
-```
-Note that the bot must be in the server that the channel is in.
+To run this bot, you'll first need to set up a `config.json` file in the bot's root directory. Instructions on how to do this can be found on [the wiki](https://github.com/NinjaCheetah/AhCounter/wiki).
 
 ## First Run
 The first time the bot is run, or if the JSON files are deleted, the bot will automatically create `counters.json` and `devcounters.json`. These are the files that the word counts are stored in. `counters.json` is used for normal operation and `devcounters.json` is used if the bot is in development mode, mostly just for testing new features. This auto-generated file will only count "Ah" by default. Documentation regarding adding new words is coming soon.
