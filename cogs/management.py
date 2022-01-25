@@ -70,7 +70,7 @@ class Management(commands.Cog):
         with open("words.txt", "r") as f:
             status_word_list = f.readlines()
         status_string = ""
-        for i in range(3):
+        for i in range(4):
             status_string += str(random.choice(status_word_list)).strip()+" "
         activity = discord.Game(name=status_string, type=3)
         await self.bot.change_presence(activity=activity)
