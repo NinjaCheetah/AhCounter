@@ -85,7 +85,7 @@ class Management(commands.Cog):
         embed.add_field(name="Creator:", value="NinjaCheetah", inline=False)
         embed.add_field(name=":trophy: Words I count:", value="Ah, Bruh, Oof, Oh, ;P (:P and :winktongue: too)", inline=False)
         embed.add_field(name=":snake: Python version:", value="3.9.9")
-        embed.add_field(name="Bot version:", value="v1.4")
+        embed.add_field(name="Bot version:", value="v1.5")
         await ctx.send(embed=embed)
 
     @commands.command()
