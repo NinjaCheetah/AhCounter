@@ -69,8 +69,9 @@ class Management(commands.Cog):
     async def status_random(self, ctx):
         with open("words.txt", "r") as f:
             status_word_list = f.readlines()
+        num_words = random.randrange(3,6)
         status_string = ""
-        for i in range(4):
+        for i in range(num_words):
             status_string += str(random.choice(status_word_list)).strip()+" "
         activity = discord.Game(name=status_string, type=3)
         await self.bot.change_presence(activity=activity)
