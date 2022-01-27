@@ -88,31 +88,6 @@ class Management(commands.Cog):
         embed.add_field(name="Bot version:", value="v1.4")
         await ctx.send(embed=embed)
 
-    @commands.command(name='dev', help='Switches the bot into dev mode.')
-    @commands.is_owner()
-    async def devmode(self, ctx):
-        activity = discord.Game(name="Development Mode, Counts Are Not Saved!", type=3)
-        await self.bot.change_presence(activity=activity)
-        devcounters = load_devcounters()
-        for key in devcounters:
-            i = devcounters[key]
-            i["count"] = 0
-        save_devcounters(devcounters)
-        self.bot.unload_extension("cogs.counter")
-        self.bot.unload_extension("cogs.help")
-        self.bot.load_extension("cogs.devcounter")
-        await ctx.send(":white_check_mark: The bot is now in development mode.\n:warning: **The dev mode count will reset if you exit and re-enter dev mode!** :warning:")
-
-    @commands.command(name='nodev', help='Switches the bot out of dev mode.')
-    @commands.is_owner()
-    async def nodevmode(self, ctx):
-        activity = discord.Game(name="Counting Ahs", type=3)
-        await self.bot.change_presence(activity=activity)
-        self.bot.unload_extension("cogs.devcounter")
-        self.bot.load_extension("cogs.counter")
-        self.bot.load_extension("cogs.help")
-        await ctx.send(":white_check_mark: The bot is now back to normal operation. All word counts restored.\n:warning: **The dev mode count has been erased!** :warning:")
-
     @commands.command()
     @commands.is_owner()
     async def shutdown(self, ctx):

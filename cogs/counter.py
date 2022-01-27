@@ -58,7 +58,7 @@ class Message_Counter(commands.Cog):
 
     @commands.command(name='milestones')
     async def milestones(self, ctx):
-        await ctx.send("Milestones: `" + str(milestones) + "`\nMessage format: :trophy: Milestone! Count: <count>")
+        await ctx.send("Milestones: `" + str(milestones) + "`\nMessage format: :trophy: Milestone reached! <word> Count: <count>")
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -69,6 +69,9 @@ class Message_Counter(commands.Cog):
                 i = counters[key]
                 if re.findall("\\b"+str(i["regex"])+"+\\b", message.content, re.IGNORECASE):
                     i["count"] += 1
+                    if i["count"] in milestones:
+                        if not channel == 0:
+                            await message.channel.send(":trophy: Milestone reached! "+str(i["display"])+" Count: "+str(i["count"]))
                 save_counters(counters)
             if message.author.id in sleepusers:
                 if has_sleep(message.content):

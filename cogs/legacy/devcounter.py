@@ -5,14 +5,26 @@ from discord.ext import commands
 import discord.utils
 import json
 import re
-import time
+import unidecode
 
 dev_milestones = [10,25,50,75,100,150,200,300,400,500,1000,1500,2000,3000,4000,5000,6000,7000,8000,9000,10000]
-sleepusers = [327757456673472523, 644449298087411732]
+sleepusers = []
+sleepwords = ["tired", "bed", "rest"]
+SLEEP_REGEX = ".?[sxz\u0455]+.?.?[l1|]+.?.?[e3\u0435\u0395]+.?.?[e3\u0435\u0395]+.?.?[p\u0440\u03A1].?"
 
 with open('config.json', 'r') as f:
-    config = json.load(f)
+    try:
+        config = json.load(f)
+    except Exception as e:
+        exc = '{}: {}'.format(type(e).__name__, e)
+        print('Error loading config.json: {}'.format( exc))
 MILESTONE_CHANNEL = config["MILESTONE_CHANNEL"]
+try:
+    for key in config["SLEEPUSERS"]:
+        i = config["SLEEPUSERS"][key]
+        sleepusers.append(int(i["ID"]))
+except Exception as e:
+    sleepusers = [0]
 
 def load_devcounters():
     with open('devcounters.json', 'r') as f:
@@ -22,6 +34,13 @@ def load_devcounters():
 def save_devcounters(counters):
     with open('devcounters.json', 'w') as f:
        json.dump(counters, f, indent=4)
+
+def has_sleep(string):
+    match = re.search(SLEEP_REGEX, string, flags=re.IGNORECASE)
+    if not match:
+        string = unidecode.unidecode(string)
+        match = re.search(SLEEP_REGEX, string, flags=re.IGNORECASE)
+    return match
 
 class DevMessage_Counter(commands.Cog):
     def __init__(self, client):
@@ -39,7 +58,7 @@ class DevMessage_Counter(commands.Cog):
 
     @commands.command(name='devmilestones')
     async def devmilestones(self, ctx):
-        await ctx.send('Milestones: `10, 25, 50, 75, 100`\nMessage format: :trophy: Milestone! Count: <count>')
+        await ctx.send("Milestones: `" + str(dev_milestones) + "`\nMessage format: :trophy: Milestone reached! <word> Count: <count>")
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -50,14 +69,17 @@ class DevMessage_Counter(commands.Cog):
                 i = counters[key]
                 if re.findall("\\b"+str(i["regex"])+"+\\b", message.content, re.IGNORECASE):
                     i["count"] += 1
+                    if i["count"] in milestones:
+                        if not channel == 0:
+                            await message.channel.send(":trophy: Milestone reached! "+str(i["display"])+" Count: "+str(i["count"]))
                 save_devcounters(counters)
             if message.author.id in sleepusers:
-                if re.findall(r"\**_*[s$§ßśŝš5zxｓ*]+\**[l1iIīłïîíìĺł\)\]\}\(\[\{|¡!ｌ*]+\**[e3èé€êēęë&ｅ*]+\**[p¶ｐ*]+_*\**", message.content, re.IGNORECASE):
+                if has_sleep(message.content):
                     await message.add_reaction("🧢")
-                elif re.findall("\\bbed\\b", message.content, re.IGNORECASE):
-                    await message.add_reaction("🧢")
-                elif re.findall("\\btired\\b", message.content, re.IGNORECASE):
-                    await message.add_reaction("🧢")
+                else:
+                    for i in sleepwords:
+                        if re.findall("\\b"+str(i)+"\\b", message.content, re.IGNORECASE):
+                            await message.add_reaction("🧢")
 
 def setup(client):
     client.add_cog(DevMessage_Counter(client))

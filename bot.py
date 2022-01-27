@@ -30,11 +30,6 @@ if not os.path.exists('counters.json'):
     with open('counters.json', 'a') as f:
         f.write('{"Ah": {"regex": "ah","display": "Ah","count": 0}')
 
-if not os.path.exists('devcounters.json'):
-    os.mknod('devcounters.json')
-    with open('devcounters.json', 'a') as f:
-        f.write('{"Ah": {"regex": "ah","display": "Ah","count": 0}')
-
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
