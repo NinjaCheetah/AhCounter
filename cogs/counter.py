@@ -1,6 +1,5 @@
 # counter.py
 from discord.ext import commands
-import discord.utils
 import json
 import re
 import unidecode
