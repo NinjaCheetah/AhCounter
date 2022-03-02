@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 import discord.utils
 import json
-import re
 import time
 import random
 
@@ -83,7 +82,6 @@ class Management(commands.Cog):
         embed.set_author(name="About")
         embed.add_field(name=":computer: Host:", value="Raspberry Pi 3B", inline=True)
         embed.add_field(name="Creator:", value="NinjaCheetah", inline=False)
-        embed.add_field(name=":trophy: Words I count:", value="Ah, Bruh, Oof, Oh, ;P (:P and :winktongue: too)", inline=False)
         embed.add_field(name=":snake: Python version:", value="3.9.9")
         embed.add_field(name="Bot version:", value="v1.5")
         await ctx.send(embed=embed)
