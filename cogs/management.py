@@ -92,5 +92,5 @@ class Management(commands.Cog):
         await ctx.send(":electric_plug: Shutting down...")
         await ctx.bot.logout()
 
-def setup(bot):
-    bot.add_cog(Management(bot))
+async def setup(bot):
+    await bot.add_cog(Management(bot))

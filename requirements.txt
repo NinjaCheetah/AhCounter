@@ -1,2 +1,3 @@
 git+https://github.com/LightSage/discord.py
 unidecode
+jishaku

@@ -86,5 +86,5 @@ class Message_Counter(commands.Cog):
                         if re.findall("\\b"+str(i)+"\\b", message.content, re.IGNORECASE):
                             await message.add_reaction("🧢")
 
-def setup(client):
-    client.add_cog(Message_Counter(client))
+async def setup(client):
+    await client.add_cog(Message_Counter(client))
