@@ -49,7 +49,7 @@ async def on_command_error(ctx, error):
 @commands.is_owner()
 async def load(ctx, extension):
     try:
-        bot.load_extension(f'cogs.{extension}')
+        await bot.load_extension(f'cogs.{extension}')
         await ctx.send(":white_check_mark: Loaded `cogs."+extension+"`")
     except Exception as e:
         exc = '{}: {}'.format(type(e).__name__, e)
@@ -58,14 +58,14 @@ async def load(ctx, extension):
 @bot.command(name='unload', help='Unloads an extension.')
 @commands.is_owner()
 async def unload(ctx, extension):
-    bot.unload_extension(f'cogs.{extension}')
+    await bot.unload_extension(f'cogs.{extension}')
     await ctx.send(":white_check_mark: Unloaded `cogs."+extension+"`")
 
 @bot.command(name='reload', help='Reloads an extension.')
 @commands.is_owner()
 async def reload(ctx, extension):
     try:
-        bot.reload_extension(f'cogs.{extension}')
+        await bot.reload_extension(f'cogs.{extension}')
         await ctx.send(":repeat: Reloaded `cogs."+extension+"`")
     except Exception as e:
         exc = '{}: {}'.format(type(e).__name__, e)
@@ -76,7 +76,7 @@ async def reload(ctx, extension):
 async def reloadall(ctx):
     for extension in startup_extensions:
         try:
-            bot.reload_extension(extension)
+            await bot.reload_extension(extension)
             await ctx.send(":repeat: Reloaded `"+extension+"`")
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)

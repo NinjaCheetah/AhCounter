@@ -1,6 +1,7 @@
 # help.py
 import discord
 from discord.ext import commands
+import platform
 
 class Help(commands.Cog):
     """
@@ -29,6 +30,16 @@ class Help(commands.Cog):
         embed.add_field(name="reload", value="Reloads a cog", inline=True)
         embed.add_field(name="reloadall", value="Reloads all cogs", inline=True)
         embed.add_field(name="shutdown", value="Shuts down the bot", inline=False)
+        await ctx.send(embed=embed)
+
+    @commands.command(name="about")
+    async def about(self, ctx):
+        embed=discord.Embed(title="Ah Counter", color=0x00ff00)
+        embed.set_author(name="About")
+        embed.add_field(name=":computer: Host:", value="Raspberry Pi 3B", inline=True)
+        embed.add_field(name="Creator:", value="NinjaCheetah", inline=False)
+        embed.add_field(name=":snake: Python version:", value=platform.python_version())
+        embed.add_field(name="Bot version:", value="v1.6")
         await ctx.send(embed=embed)
 
 

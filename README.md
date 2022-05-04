@@ -11,3 +11,11 @@ All maintained extensions are loaded automatically on bot startup. Legacy extens
 
 ## The Config File
 Ah Counter requires a couple values in its config file to start, which are detailed above. On top of that, you are able to specify users that you want on the "sleep users" list. This is a feature designed for fun that replies with "🧢" when these people say "sleep". Details on how this works are coming soon. You can safely omit these values in the meantime and it will not cause issues.
+
+
+## Docker
+A Dockerfile is now provided for Ah Counter. You can build the image with:
+`docker build -t ahcounter .`
+and run it with
+`docker run -it --rm --name ahcounter ahcounter`
+Note that there are currently some issues with Docker, the biggest being that the counters.json file will not be preserved outside of the Docker image.

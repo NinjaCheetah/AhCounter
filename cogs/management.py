@@ -72,19 +72,10 @@ class Management(commands.Cog):
         status_string = ""
         for i in range(num_words):
             status_string += str(random.choice(status_word_list)).strip()+" "
+        status_string = status_string[:len(status_string)-1]
         activity = discord.Game(name=status_string, type=3)
         await self.bot.change_presence(activity=activity)
         await ctx.send(":white_check_mark: Set status to: `" + status_string + "`")
-
-    @commands.command(name="about")
-    async def about(self, ctx):
-        embed=discord.Embed(title="Ah Counter", color=0x00ff00)
-        embed.set_author(name="About")
-        embed.add_field(name=":computer: Host:", value="Raspberry Pi 3B", inline=True)
-        embed.add_field(name="Creator:", value="NinjaCheetah", inline=False)
-        embed.add_field(name=":snake: Python version:", value="3.9.9")
-        embed.add_field(name="Bot version:", value="v1.5")
-        await ctx.send(embed=embed)
 
     @commands.command()
     @commands.is_owner()
