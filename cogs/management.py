@@ -16,20 +16,8 @@
 import discord
 from discord.ext import commands
 import discord.utils
-import json
 import time
 import random
-
-
-def load_devcounters():
-    with open('devcounters.json', 'r') as f:
-       devcounters = json.load(f)
-    return devcounters
-
-
-def save_devcounters(devcounters):
-    with open('devcounters.json', 'w') as f:
-       json.dump(devcounters, f, indent=4)
 
 
 class Management(commands.Cog):
@@ -49,7 +37,8 @@ class Management(commands.Cog):
     @commands.group(name='status', invoke_without_command=True)
     @commands.is_owner()
     async def status(self, ctx):
-        await ctx.send(":x: Use `$status set <message>` to set status message, or if you are indecisive then use `$status random`.")
+        await ctx.send(":x: Use `$status set <message>` to set status message, or if you are indecisive then "
+                       "use `$status random`.")
 
     @status.command(aliases=['Set', 'set', '-s', '-S'])
     @commands.is_owner()
@@ -89,7 +78,7 @@ class Management(commands.Cog):
     async def status_random(self, ctx):
         with open("words.txt", "r") as f:
             status_word_list = f.readlines()
-        num_words = random.randrange(3,6)
+        num_words = random.randrange(3, 6)
         status_string = ""
         for i in range(num_words):
             status_string += str(random.choice(status_word_list)).strip()+" "
