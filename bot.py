@@ -139,16 +139,14 @@ async def prepare_tables():
             bot_guilds = bot.guilds
             for guild in bot_guilds:
                 guild_id = '{}'.format(guild.id)
-                await cursor.execute('SELECT count(name) FROM sqlite_master WHERE type="table" AND name=? ', (guild_id,))
-                if await cursor.fetchone() == 0:
-                    sql = '''
-                        CREATE TABLE {}
-                            (ID INT PRIMARY KEY     NOT NULL,
-                            WORD           TEXT    NOT NULL,
-                            REGEX           TEXT     NOT NULL,
-                            COUNT        INT            NOT NULL)
-                    '''
-                    await cursor.execute(sql.format("\""+guild_id+"\""))
+                sql = '''
+                    CREATE TABLE IF NOT EXISTS{}
+                        (ID INT PRIMARY KEY     NOT NULL,
+                        WORD           TEXT    NOT NULL,
+                        REGEX           TEXT     NOT NULL,
+                        COUNT        INT            NOT NULL)
+                '''
+                await cursor.execute(sql.format("\"" + guild_id + "\""))
                 check_row_template = 'SELECT count(*) as tot FROM {}'
                 await cursor.execute(check_row_template.format("\"" + guild_id + "\""))
                 if not min(await cursor.fetchone()) > 0:
