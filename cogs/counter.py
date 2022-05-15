@@ -17,18 +17,21 @@ from discord.ext import commands
 import json
 import re
 import unidecode
+import asqlite
 
-milestones = [10,25,50,75,100,150,200,300,400,500,1000,1500,2000,3000,4000,5000,6000,7000,8000,9000,10000]
+milestones = [10, 25, 50, 75, 100, 150, 200, 300, 400, 500, 1000, 1500, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000,
+              10000]
 sleepusers = []
 sleepwords = ["tired", "bed", "rest"]
-SLEEP_REGEX = [".?[s5xz\u0455]+.?.?[l1|]+.?.?[e3\u0435\u0395]+.?.?[e3\u0435\u0395]+.?.?[p\u0440\u03A1].?", ".?01010011.?01101100.?01100101.?01100101.?0111000.?"]
+SLEEP_REGEX = [".?[s5xz\u0455]+.?.?[l1|]+.?.?[e3\u0435\u0395]+.?.?[e3\u0435\u0395]+.?.?[p\u0440\u03A1].?",
+               ".?01010011.?01101100.?01100101.?01100101.?0111000.?"]
 
 with open('config.json', 'r') as f:
     try:
         config = json.load(f)
     except Exception as e:
         exc = '{}: {}'.format(type(e).__name__, e)
-        print('Error loading config.json: {}'.format( exc))
+        print('Error loading config.json: {}'.format(exc))
 MILESTONE_CHANNEL = config["MILESTONE_CHANNEL"]
 try:
     for key in config["SLEEPUSERS"]:
@@ -37,71 +40,94 @@ try:
 except Exception as e:
     sleepusers = [0]
 
-def load_counters():
-    with open('counters.json', 'r') as f:
-       counters = json.load(f)
-    return counters
-
-def save_counters(counters):
-    with open('counters.json', 'w') as f:
-       json.dump(counters, f, indent=4)
 
 def has_sleep(string):
     match = re.search(SLEEP_REGEX[0], string, flags=re.IGNORECASE)
     if not match:
         string = unidecode.unidecode(string)
         match = re.search(SLEEP_REGEX[0], string, flags=re.IGNORECASE)
-    #match = False
-    #for i in SLEEP_REGEX:
-    #    if not match:
-    #        match = re.search(SLEEP_REGEX[i], string, flags=re.IGNORECASE)
-    #string = unidecode.unidecode(string)
-    #for i in SLEEP_REGEX:
-    #    if not match:
-    #        match = re.search(SLEEP_REGEX[i], string, flags=re.IGNORECASE)
     return match
 
-class Message_Counter(commands.Cog):
+
+async def build_master_list(message, guild_id):
+    async with asqlite.connect('counters.db') as db:
+        async with db.cursor() as cursor:
+            sql = 'SELECT ID FROM {}'
+            await cursor.execute(sql.format("\"" + guild_id + "\""))
+            id_list = [item for t in await cursor.fetchall() for item in t]
+            sql = 'SELECT REGEX FROM {}'
+            await cursor.execute(sql.format("\"" + guild_id + "\""))
+            regex_strings = [item for t in await cursor.fetchall() for item in t]
+            sql = 'SELECT WORD FROM {}'
+            await cursor.execute(sql.format("\"" + guild_id + "\""))
+            word_strings = [item for t in await cursor.fetchall() for item in t]
+            sql = 'SELECT COUNT FROM {}'
+            await cursor.execute(sql.format("\"" + guild_id + "\""))
+            count_list = [item for t in await cursor.fetchall() for item in t]
+            check_row_template = 'SELECT count(*) as tot FROM {}'
+            await cursor.execute(check_row_template.format("\"" + guild_id + "\""))
+            master_list = []
+            for i in range(min(await cursor.fetchone())):
+                master_list.append({"id": id_list[i], "word": word_strings[i], "regex": regex_strings[i],
+                                    "count": count_list[i]})
+    return master_list
+
+
+class WordCounter(commands.Cog):
     """
-    The code that handles coutning words and saving them.
+    The code that handles counting words and saving them.
     """
+
     def __init__(self, client):
         self.client = client
 
     @commands.command(name='count', help='Displays the counts from all word counters.')
     async def countall(self, message):
-        counters = load_counters()
-        await message.channel.send("**Counting all the words!**")
-        wordcounts = ""
-        for key in counters:
-            i = counters[key]
-            wordcounts += ""+str(i['display'])+" Count: "+str(i['count'])+"\n"
-        await message.channel.send(wordcounts)
+        async with asqlite.connect('counters.db') as db:
+            async with db.cursor() as cursor:
+                guild_id = '{}'.format(message.guild.id)
+                master_list = await build_master_list(message, guild_id)
+                wordcounts = ""
+                await message.channel.send("**Counting all the words!**")
+                for key in master_list:
+                    wordcounts += "" + str(key["word"]) + " Count: " + str(key["count"]) + "\n"
+                await message.channel.send(wordcounts)
 
     @commands.command(name='milestones')
     async def milestones(self, ctx):
-        await ctx.send("Milestones: `" + str(milestones) + "`\nMessage format: :trophy: Milestone reached! <word> Count: <count>")
+        await ctx.send(
+            "Milestones: `" + str(milestones) + "`\nMessage format: :trophy: Milestone reached! <word> Count: <count>")
 
     @commands.Cog.listener()
     async def on_message(self, message):
         channel = self.client.get_channel(MILESTONE_CHANNEL)
-        if message.guild != None and message.author.id != 737755242757881937:
-            counters = load_counters()
-            for key in counters:
-                i = counters[key]
-                if re.findall("\\b"+str(i["regex"])+"+\\b", message.content, re.IGNORECASE):
-                    i["count"] += 1
-                    if i["count"] in milestones:
-                        if not channel == 0:
-                            await message.channel.send(":trophy: Milestone reached! "+str(i["display"])+" Count: "+str(i["count"]))
-                save_counters(counters)
-            if message.author.id in sleepusers:
-                if has_sleep(message.content):
-                    await message.add_reaction("🧢")
-                else:
-                    for i in sleepwords:
-                        if re.findall("\\b"+str(i)+"\\b", message.content, re.IGNORECASE):
-                            await message.add_reaction("🧢")
+        if message.guild is not None and message.author.id != 737755242757881937:
+            async with asqlite.connect('counters.db') as db:
+                async with db.cursor() as cursor:
+                    guild_id = '{}'.format(message.guild.id)
+                    master_list = await build_master_list(message, guild_id)
+                    for key in master_list:
+                        if re.findall("\\b" + str(key["regex"]) + "+\\b", message.content, re.IGNORECASE):
+                            key["count"] += 1
+                            if key["count"] in milestones:
+                                await cursor.execute('SELECT MILESTONE_CHANNEL FROM guild_settings WHERE GUILD_ID == ?',
+                                                     message.guild.id)
+                                milestone_channel_tuple = [item for t in await cursor.fetchall() for item in t]
+                                milestone_channel = int(min(milestone_channel_tuple))
+                                if not milestone_channel == 0:
+                                    await message.channel.send(
+                                        ":trophy: Milestone reached! " + str(key["word"]) + " Count: " + str(key["count"]))
+                            sql = 'UPDATE {} set COUNT = {} where ID = ?'
+                            await cursor.execute(sql.format("\""+guild_id+"\"", key["count"]), (key["id"],))
+                            await db.commit()
+        if message.author.id in sleepusers:
+            if has_sleep(message.content):
+                await message.add_reaction("🧢")
+            else:
+                for i in sleepwords:
+                    if re.findall("\\b" + str(i) + "\\b", message.content, re.IGNORECASE):
+                        await message.add_reaction("🧢")
+
 
 async def setup(client):
-    await client.add_cog(Message_Counter(client))
+    await client.add_cog(WordCounter(client))

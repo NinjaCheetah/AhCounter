@@ -20,14 +20,17 @@ import json
 import time
 import random
 
+
 def load_devcounters():
     with open('devcounters.json', 'r') as f:
        devcounters = json.load(f)
     return devcounters
 
+
 def save_devcounters(devcounters):
     with open('devcounters.json', 'w') as f:
        json.dump(devcounters, f, indent=4)
+
 
 class Management(commands.Cog):
     """
@@ -100,6 +103,7 @@ class Management(commands.Cog):
     async def shutdown(self, ctx):
         await ctx.send(":electric_plug: Shutting down...")
         await ctx.bot.logout()
+
 
 async def setup(bot):
     await bot.add_cog(Management(bot))
