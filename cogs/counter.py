@@ -112,7 +112,8 @@ class WordCounter(commands.Cog):
                                 await cursor.execute('SELECT MILESTONE_CHANNEL FROM guild_settings WHERE GUILD_ID == ?',
                                                      message.guild.id)
                                 milestone_channel_tuple = [item for t in await cursor.fetchall() for item in t]
-                                milestone_channel = int(min(milestone_channel_tuple))
+                                milestone_channel_id = int(min(milestone_channel_tuple))
+                                milestone_channel = self.bot.get_channel(milestone_channel_id)
                                 if not milestone_channel == 0:
                                     await message.milestone_channel.send(
                                         ":trophy: Milestone reached! " + str(key["word"]) + " Count: " + str(key["count"]))
