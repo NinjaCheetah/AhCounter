@@ -100,7 +100,6 @@ class WordCounter(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        channel = self.client.get_channel(MILESTONE_CHANNEL)
         if message.guild is not None and message.author.id != 737755242757881937:
             async with asqlite.connect('counters.db') as db:
                 async with db.cursor() as cursor:

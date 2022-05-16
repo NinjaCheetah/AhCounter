@@ -141,7 +141,7 @@ async def prepare_tables():
                 guild_id = '{}'.format(guild.id)
                 sql = '''
                     CREATE TABLE IF NOT EXISTS{}
-                        (ID INT PRIMARY KEY     NOT NULL,
+                        (ID INTEGER PRIMARY KEY     AUTOINCREMENT,
                         WORD           TEXT    NOT NULL,
                         REGEX           TEXT     NOT NULL,
                         COUNT        INT            NOT NULL)
@@ -152,9 +152,9 @@ async def prepare_tables():
                 if not min(await cursor.fetchone()) > 0:
                     sql = '''
                         INSERT INTO {} 
-                        (ID,WORD,REGEX,COUNT) 
+                        (WORD,REGEX,COUNT) 
                         VALUES 
-                        (1, 'Ah', 'ah', 0 )
+                        ('Ah', 'ah', 0 )
                     '''
                     await cursor.execute(sql.format("\""+guild_id+"\""))
                     await db.commit()
@@ -165,6 +165,7 @@ async def on_ready():
     print('Ready.')
     await prepare_tables()
     await prepare_guild_settings()
+    await bot.tree.sync()
 
 
 async def main():
