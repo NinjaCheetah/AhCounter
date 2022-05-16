@@ -114,7 +114,7 @@ class WordCounter(commands.Cog):
                                 milestone_channel_tuple = [item for t in await cursor.fetchall() for item in t]
                                 milestone_channel = int(min(milestone_channel_tuple))
                                 if not milestone_channel == 0:
-                                    await message.channel.send(
+                                    await message.milestone_channel.send(
                                         ":trophy: Milestone reached! " + str(key["word"]) + " Count: " + str(key["count"]))
                             sql = 'UPDATE {} set COUNT = {} where ID = ?'
                             await cursor.execute(sql.format("\""+guild_id+"\"", key["count"]), (key["id"],))

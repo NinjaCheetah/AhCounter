@@ -157,6 +157,13 @@ class Management(commands.Cog):
                 channel = self.bot.get_channel(channel_id_int)
                 if channel is None:
                     await interaction.response.send_message(":warning: That channel could not be found!")
+                elif channel == 0:
+                    sql = 'UPDATE guild_settings set MILESTONE_CHANNEL = {} where GUILD_ID = ?'
+                    await cursor.execute(sql.format(channel_id_int), (guild_id,))
+                    await db.commit()
+                    await interaction.response.send_message(":white_check_mark: Milestone channel set to `" +
+                                                            channel_id.replace(" ", "") + "`! Messages are now "
+                                                                                          "disabled.")
                 else:
                     sql = 'UPDATE guild_settings set MILESTONE_CHANNEL = {} where GUILD_ID = ?'
                     await cursor.execute(sql.format(channel_id_int), (guild_id,))
