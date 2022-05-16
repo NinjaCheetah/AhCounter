@@ -45,8 +45,6 @@ startup_extensions = ["cogs.counter", "cogs.help", "cogs.management"]
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send(":x: You are missing a required argument!")
-    if isinstance(error, commands.CommandNotFound):
-        await ctx.send(":x: That command could not be found.")
     if isinstance(error, commands.ExtensionError):
         await ctx.send(":x: That extension could not be found!")
     if isinstance(error, commands.ExtensionNotLoaded):
