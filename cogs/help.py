@@ -17,16 +17,18 @@ import discord
 from discord.ext import commands
 import platform
 
+
 class Help(commands.Cog):
     """
     Basic help command embeds.
     """
+
     def __init__(self, bot):
         self.bot = bot
 
     @commands.group(name='help', help='Shows this message', invoke_without_command=True)
     async def help(self, ctx):
-        embed=discord.Embed(title="Ah Counter Commands", color=0xffff00)
+        embed = discord.Embed(title="Ah Counter Commands", color=0xffff00)
         embed.set_author(name="Ah Counter Help")
         embed.add_field(name="about", value="Shows info about the bot.", inline=False)
         embed.add_field(name="count", value="Shows the counts for all words.", inline=False)
@@ -36,9 +38,11 @@ class Help(commands.Cog):
 
     @commands.group(name='ownerhelp', help='Shows this message', invoke_without_command=True)
     async def secrethelp(self, ctx):
-        embed=discord.Embed(title="Owner-Only Management Commands", color=0xff0000)
+        embed = discord.Embed(title="Owner-Only Management Commands", color=0xff0000)
         embed.set_author(name="Owner Help")
-        embed.add_field(name="status", value="Use `$status set <message>` to set a status or `$status random` to pick a random one", inline=False)
+        embed.add_field(name="status",
+                        value="Use `$status set <message>` to set a status or `$status random` to pick a random one",
+                        inline=False)
         embed.add_field(name="load", value="Loads a cog", inline=True)
         embed.add_field(name="unload", value="Unloads a cog", inline=True)
         embed.add_field(name="reload", value="Reloads a cog", inline=True)
@@ -48,7 +52,7 @@ class Help(commands.Cog):
 
     @commands.command(name="about")
     async def about(self, ctx):
-        embed=discord.Embed(title="Ah Counter", color=0x00ff00)
+        embed = discord.Embed(title="Ah Counter", color=0x00ff00)
         embed.set_author(name="About")
         embed.add_field(name=":computer: Host:", value="Raspberry Pi 3B", inline=True)
         embed.add_field(name="Creator:", value="NinjaCheetah", inline=False)
