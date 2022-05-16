@@ -28,6 +28,7 @@ TOKEN = config["TOKEN"]
 class Bot(commands.Bot):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
+        self.db = None
 
     async def process_commands(self, message: discord.Message):
         ctx = await self.get_context(message)
@@ -107,55 +108,53 @@ async def load_extensions():
 
 
 async def prepare_guild_settings():
-    async with asqlite.connect('counters.db') as db:
-        async with db.cursor() as cursor:
-            sql = '''
-                CREATE TABLE IF NOT EXISTS guild_settings
-                    (ID INTEGER PRIMARY KEY     AUTOINCREMENT,
-                    GUILD_ID           INT    NOT NULL,
-                    MILESTONE_CHANNEL           INT     NOT NULL)
-            '''
-            await cursor.execute(sql)
-            sql = 'SELECT GUILD_ID FROM guild_settings'
-            await cursor.execute(sql)
-            guild_id_list = [item for t in await cursor.fetchall() for item in t]
-            bot_guilds = bot.guilds
-            for guild in bot_guilds:
-                if guild.id not in guild_id_list:
-                    sql = '''
-                        INSERT INTO guild_settings 
-                        (GUILD_ID,MILESTONE_CHANNEL)
-                        VALUES ({}, 0)
-                    '''
-                    await cursor.execute(sql.format(guild.id))
-            await db.commit()
+    async with bot.db.cursor() as cursor:
+        sql = '''
+            CREATE TABLE IF NOT EXISTS guild_settings
+                (ID INTEGER PRIMARY KEY     AUTOINCREMENT,
+                GUILD_ID           INT    NOT NULL,
+                MILESTONE_CHANNEL           INT     NOT NULL)
+        '''
+        await cursor.execute(sql)
+        sql = 'SELECT GUILD_ID FROM guild_settings'
+        await cursor.execute(sql)
+        guild_id_list = [item for t in await cursor.fetchall() for item in t]
+        bot_guilds = bot.guilds
+        for guild in bot_guilds:
+            if guild.id not in guild_id_list:
+                sql = '''
+                    INSERT INTO guild_settings 
+                    (GUILD_ID,MILESTONE_CHANNEL)
+                    VALUES ({}, 0)
+                '''
+                await cursor.execute(sql.format(guild.id))
+        await bot.db.commit()
 
 
 async def prepare_tables():
-    async with asqlite.connect('counters.db') as db:
-        async with db.cursor() as cursor:
-            bot_guilds = bot.guilds
-            for guild in bot_guilds:
-                guild_id = '{}'.format(guild.id)
+    async with bot.db.cursor() as cursor:
+        bot_guilds = bot.guilds
+        for guild in bot_guilds:
+            guild_id = '{}'.format(guild.id)
+            sql = '''
+                CREATE TABLE IF NOT EXISTS{}
+                    (ID INTEGER PRIMARY KEY     AUTOINCREMENT,
+                    WORD           TEXT    NOT NULL,
+                    REGEX           TEXT     NOT NULL,
+                    COUNT        INT            NOT NULL)
+            '''
+            await cursor.execute(sql.format("\"" + guild_id + "\""))
+            check_row_template = 'SELECT count(*) as tot FROM {}'
+            await cursor.execute(check_row_template.format("\"" + guild_id + "\""))
+            if not min(await cursor.fetchone()) > 0:
                 sql = '''
-                    CREATE TABLE IF NOT EXISTS{}
-                        (ID INTEGER PRIMARY KEY     AUTOINCREMENT,
-                        WORD           TEXT    NOT NULL,
-                        REGEX           TEXT     NOT NULL,
-                        COUNT        INT            NOT NULL)
+                    INSERT INTO {} 
+                    (WORD,REGEX,COUNT) 
+                    VALUES 
+                    ('Ah', 'ah', 0 )
                 '''
-                await cursor.execute(sql.format("\"" + guild_id + "\""))
-                check_row_template = 'SELECT count(*) as tot FROM {}'
-                await cursor.execute(check_row_template.format("\"" + guild_id + "\""))
-                if not min(await cursor.fetchone()) > 0:
-                    sql = '''
-                        INSERT INTO {} 
-                        (WORD,REGEX,COUNT) 
-                        VALUES 
-                        ('Ah', 'ah', 0 )
-                    '''
-                    await cursor.execute(sql.format("\""+guild_id+"\""))
-                    await db.commit()
+                await cursor.execute(sql.format("\""+guild_id+"\""))
+                await bot.db.commit()
 
 
 @bot.event
@@ -168,6 +167,7 @@ async def on_ready():
 
 async def main():
     async with bot:
+        bot.db = await asqlite.connect("counters.db")
         await load_extensions()
         await bot.start(TOKEN)
 
