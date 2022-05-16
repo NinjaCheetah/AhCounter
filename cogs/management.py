@@ -155,7 +155,7 @@ class Management(commands.Cog):
                     await interaction.response.send_message(":warning: Please enter a valid channel ID.")
                     return
                 channel = self.bot.get_channel(channel_id_int)
-                if channel == 0:
+                if channel_id_int == 0:
                     sql = 'UPDATE guild_settings set MILESTONE_CHANNEL = {} where GUILD_ID = ?'
                     await cursor.execute(sql.format(channel_id_int), (guild_id,))
                     await db.commit()
