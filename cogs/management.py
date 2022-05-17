@@ -21,6 +21,10 @@ import time
 import random
 
 
+def check_slash_perms(interaction: discord.Interaction) -> bool:
+    return interaction.user.id == 455681686823239681 or interaction.user.guild_permissions.manage_guild is True
+
+
 class Management(commands.Cog):
     """
     Management commands, such as setting the bot's status.
@@ -96,7 +100,7 @@ class Management(commands.Cog):
         await ctx.bot.logout()
 
     @app_commands.command()
-    @commands.is_owner()
+    @app_commands.check(check_slash_perms)
     async def addword(self, interaction: discord.Interaction, new_word: str, new_regex: str):
         """Adds a new word to the database"""
         async with self.bot.db.cursor() as cursor:
@@ -122,7 +126,7 @@ class Management(commands.Cog):
                 await interaction.response.send_message(":warning: That word is already in the database!")
 
     @app_commands.command()
-    @commands.is_owner()
+    @app_commands.check(check_slash_perms)
     async def delword(self, interaction: discord.Interaction, word: str):
         """Removes a word from the database"""
         async with self.bot.db.cursor() as cursor:
@@ -140,7 +144,7 @@ class Management(commands.Cog):
                 await interaction.response.send_message(":warning: That word is not in the database!")
 
     @app_commands.command()
-    @commands.is_owner()
+    @app_commands.check(check_slash_perms)
     async def set_milestone_channel(self, interaction: discord.Interaction, channel_id: str):
         """Sets the milestone channel for the current server"""
         async with self.bot.db.cursor() as cursor:
