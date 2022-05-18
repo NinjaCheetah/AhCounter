@@ -92,14 +92,17 @@ class WordCounter(commands.Cog):
                         if key["count"] in milestones:
                             await cursor.execute('SELECT MILESTONE_CHANNEL FROM guild_settings WHERE GUILD_ID == ?',
                                                  message.guild.id)
-                            milestone_channel_tuple = [item for t in await cursor.fetchall() for item in t]
-                            milestone_channel_id = int(min(milestone_channel_tuple))
-                            channel = self.client.get_channel(milestone_channel_id)
-                            if not channel == 0:
+                            milestone_channel_id = int(max([item for t in await cursor.fetchall() for item in t]))
+                            if milestone_channel_id == 1:
                                 await message.channel.send(
                                     ":trophy: Milestone reached! " + str(key["word"]) + " Count: " + str(key["count"]))
+                            else:
+                                channel = self.client.get_channel(milestone_channel_id)
+                                if channel is not None:
+                                    await channel.send(":trophy: Milestone reached! " + str(key["word"]) + " Count: " +
+                                                       str(key["count"]))
                         sql = 'UPDATE {} set COUNT = {} where ID = ?'
-                        await cursor.execute(sql.format("\""+guild_id+"\"", key["count"]), (key["id"],))
+                        await cursor.execute(sql.format("\"" + guild_id + "\"", key["count"]), (key["id"],))
                         await self.client.db.commit()
         if message.author.id in SLEEPUSERS:
             if has_sleep(message.content):

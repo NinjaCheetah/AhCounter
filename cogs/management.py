@@ -163,21 +163,26 @@ class Management(commands.Cog):
             guild_id = '{}'.format(interaction.guild.id)
             try:
                 channel_id_int = int(channel_id.replace(" ", ""))
-            except:
+            except ValueError:
                 await interaction.response.send_message(":warning: Please enter a valid channel ID.")
                 return
             channel = self.bot.get_channel(channel_id_int)
+            sql = 'UPDATE guild_settings set MILESTONE_CHANNEL = {} where GUILD_ID = ?'
             if channel_id_int == 0:
-                sql = 'UPDATE guild_settings set MILESTONE_CHANNEL = {} where GUILD_ID = ?'
                 await cursor.execute(sql.format(channel_id_int), (guild_id,))
                 await self.bot.db.commit()
                 await interaction.response.send_message(":white_check_mark: Milestone channel set to `" +
                                                         channel_id.replace(" ", "") + "`! Messages are now "
                                                                                       "disabled.")
+            elif channel_id_int == 1:
+                await cursor.execute(sql.format(channel_id_int), (guild_id,))
+                await self.bot.db.commit()
+                await interaction.response.send_message(":white_check_mark: Milestone channel set to `" +
+                                                        channel_id.replace(" ", "") + "`! Messages will now "
+                                                        "be sent in the channel they're triggered from.")
             elif channel is None:
                 await interaction.response.send_message(":warning: That channel could not be found!")
             else:
-                sql = 'UPDATE guild_settings set MILESTONE_CHANNEL = {} where GUILD_ID = ?'
                 await cursor.execute(sql.format(channel_id_int), (guild_id,))
                 await self.bot.db.commit()
                 await interaction.response.send_message(":white_check_mark: Milestone channel set to <#" +
