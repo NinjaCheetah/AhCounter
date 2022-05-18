@@ -14,30 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from discord.ext import commands
-import json
 import re
 import unidecode
 
+from config import SLEEPUSERS
+
 milestones = [10, 25, 50, 75, 100, 150, 200, 300, 400, 500, 1000, 1500, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000,
-              10000]
-sleepusers = []
+              10000, 11000, 12000, 13000, 14000, 15000, 20000]
 sleepwords = ["tired", "bed", "rest"]
 SLEEP_REGEX = [".?[s5xz\u0455]+.?.?[l1|]+.?.?[e3\u0435\u0395]+.?.?[e3\u0435\u0395]+.?.?[p\u0440\u03A1].?",
                ".?01010011.?01101100.?01100101.?01100101.?0111000.?"]
-
-with open('config.json', 'r') as f:
-    try:
-        config = json.load(f)
-    except Exception as e:
-        exc = '{}: {}'.format(type(e).__name__, e)
-        print('Error loading config.json: {}'.format(exc))
-MILESTONE_CHANNEL = config["MILESTONE_CHANNEL"]
-try:
-    for key in config["SLEEPUSERS"]:
-        i = config["SLEEPUSERS"][key]
-        sleepusers.append(int(i["ID"]))
-except Exception as e:
-    sleepusers = [0]
 
 
 def has_sleep(string):
@@ -115,7 +101,7 @@ class WordCounter(commands.Cog):
                         sql = 'UPDATE {} set COUNT = {} where ID = ?'
                         await cursor.execute(sql.format("\""+guild_id+"\"", key["count"]), (key["id"],))
                         await self.client.db.commit()
-        if message.author.id in sleepusers:
+        if message.author.id in SLEEPUSERS:
             if has_sleep(message.content):
                 await message.add_reaction("🧢")
             else:

@@ -1,7 +1,12 @@
 {
     "TOKEN": "",
-    "MILESTONE_CHANNEL": 0,
     "SLEEPUSERS": {
+        "1": {
+            "ID": 0,
+            "NAME": ""
+        }
+    },
+    "BOT_MANAGERS": {
         "1": {
             "ID": 0,
             "NAME": ""

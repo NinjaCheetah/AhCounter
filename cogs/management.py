@@ -20,9 +20,11 @@ import discord.utils
 import time
 import random
 
+from config import BOT_MANAGERS
+
 
 def check_slash_perms(interaction: discord.Interaction) -> bool:
-    return interaction.user.id == 455681686823239681 or interaction.user.guild_permissions.manage_guild is True
+    return interaction.user.id in BOT_MANAGERS or interaction.user.guild_permissions.manage_guild is True
 
 
 class Management(commands.Cog):
@@ -125,6 +127,11 @@ class Management(commands.Cog):
             else:
                 await interaction.response.send_message(":warning: That word is already in the database!")
 
+    @addword.error
+    async def addword_err(self, interaction, error):
+        await interaction.response.send_message(":warning: " + str(error) + " Please make sure you have the correct"
+                                                " permissions or are a bot manager.")
+
     @app_commands.command()
     @app_commands.check(check_slash_perms)
     async def delword(self, interaction: discord.Interaction, word: str):
@@ -142,6 +149,11 @@ class Management(commands.Cog):
                                                         + word + "`!")
             else:
                 await interaction.response.send_message(":warning: That word is not in the database!")
+
+    @delword.error
+    async def delword_err(self, interaction, error):
+        await interaction.response.send_message(":warning: " + str(error) + " Please make sure you have the correct"
+                                                                            " permissions or are a bot manager.")
 
     @app_commands.command()
     @app_commands.check(check_slash_perms)
@@ -170,6 +182,11 @@ class Management(commands.Cog):
                 await self.bot.db.commit()
                 await interaction.response.send_message(":white_check_mark: Milestone channel set to <#" +
                                                         channel_id.replace(" ", "") + ">!")
+
+    @set_milestone_channel.error
+    async def set_milestone_channel_err(self, interaction, error):
+        await interaction.response.send_message(":warning: " + str(error) + " Please make sure you have the correct"
+                                                                            " permissions or are a bot manager.")
 
 
 async def setup(bot):

@@ -14,15 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import asyncio
-import json
 import discord
 from discord.ext import commands
 import asqlite
 
-with open('config.json', 'r') as f:
-    config = json.load(f)
+from config import CONFIG
 
-TOKEN = config["TOKEN"]
+
+TOKEN = CONFIG["TOKEN"]
 
 
 class Bot(commands.Bot):
