@@ -57,7 +57,7 @@ class Help(commands.Cog):
         embed.add_field(name=":computer: Host:", value="Raspberry Pi 3B", inline=True)
         embed.add_field(name="Creator:", value="NinjaCheetah", inline=False)
         embed.add_field(name=":snake: Python version:", value=platform.python_version())
-        embed.add_field(name="Bot version:", value="v2.0")
+        embed.add_field(name="Bot version:", value="v2.1")
         await ctx.send(embed=embed)
 
 
