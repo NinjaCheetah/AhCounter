@@ -22,11 +22,14 @@ import random
 
 from config import BOT_MANAGERS
 
+banned_words = ["DELETE", "delete", "DROP", "drop"]
+
 
 def check_slash_perms(interaction: discord.Interaction) -> bool:
     return interaction.user.id in BOT_MANAGERS or interaction.user.guild_permissions.manage_guild is True
 
 
+# noinspection DuplicatedCode
 class Management(commands.Cog):
     """
     Management commands, such as setting the bot's status.
@@ -106,6 +109,10 @@ class Management(commands.Cog):
     async def addword(self, interaction: discord.Interaction, new_word: str, new_regex: str):
         """Adds a new word to the database"""
         async with self.bot.db.cursor() as cursor:
+            for banned_word in banned_words:
+                if banned_word in new_word or new_regex:
+                    await interaction.response.send_message(":warning: Sorry, that word/regex is not allowed.")
+                    return
             guild_id = '{}'.format(interaction.guild.id)
             sql = 'SELECT WORD FROM guild_counters WHERE GUILD_ID=$1;'
             await cursor.execute(sql, guild_id)
@@ -133,6 +140,10 @@ class Management(commands.Cog):
     async def delword(self, interaction: discord.Interaction, word: str):
         """Removes a word from the database"""
         async with self.bot.db.cursor() as cursor:
+            for banned_word in banned_words:
+                if banned_word in word:
+                    await interaction.response.send_message(":warning: Sorry, that input is not allowed.")
+                    return
             guild_id = '{}'.format(interaction.guild.id)
             sql = 'SELECT WORD FROM guild_counters WHERE GUILD_ID=$1;'
             await cursor.execute(sql, guild_id)
@@ -156,6 +167,10 @@ class Management(commands.Cog):
     async def set_milestone_channel(self, interaction: discord.Interaction, channel_id: str):
         """Sets the milestone channel for the current server"""
         async with self.bot.db.cursor() as cursor:
+            for banned_word in banned_words:
+                if banned_word in channel_id:
+                    await interaction.response.send_message(":warning: Sorry, that input is not allowed.")
+                    return
             guild_id = '{}'.format(interaction.guild.id)
             try:
                 channel_id_int = int(channel_id.replace(" ", ""))
