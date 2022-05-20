@@ -16,6 +16,7 @@
 import discord
 from discord.ext import commands
 import platform
+import sqlite3
 
 
 class Help(commands.Cog):
@@ -54,10 +55,12 @@ class Help(commands.Cog):
     async def about(self, ctx):
         embed = discord.Embed(title="Ah Counter", color=0x00ff00)
         embed.set_author(name="About")
-        embed.add_field(name=":computer: Host:", value="Raspberry Pi 3B", inline=True)
-        embed.add_field(name="Creator:", value="NinjaCheetah", inline=False)
-        embed.add_field(name=":snake: Python version:", value=platform.python_version())
-        embed.add_field(name="Bot version:", value="v2.2")
+        embed.add_field(name="Creator:", value="NinjaCheetah", inline=True)
+        embed.add_field(name=":globe_with_meridians: Website", value="https://ncxprogramming.com/programs/ahcounter",
+                        inline=True)
+        embed.add_field(name=":snake: Python version:", value=platform.python_version(), inline=True)
+        embed.add_field(name=":clipboard: Database:", value="SQLite "+sqlite3.sqlite_version, inline=True)
+        embed.add_field(name="Bot version:", value="v2.2", inline=False)
         await ctx.send(embed=embed)
 
 
