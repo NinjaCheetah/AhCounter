@@ -36,20 +36,20 @@ def has_sleep(string):
 
 async def build_master_list(client, guild_id):
     async with client.db.cursor() as cursor:
-        sql = 'SELECT ID FROM {}'
-        await cursor.execute(sql.format("\"" + guild_id + "\""))
+        sql = 'SELECT ID FROM guild_counters WHERE GUILD_ID=$1;'
+        await cursor.execute(sql, guild_id)
         id_list = [item for t in await cursor.fetchall() for item in t]
-        sql = 'SELECT REGEX FROM {}'
-        await cursor.execute(sql.format("\"" + guild_id + "\""))
+        sql = 'SELECT REGEX FROM guild_counters WHERE GUILD_ID=$1;'
+        await cursor.execute(sql, guild_id)
         regex_strings = [item for t in await cursor.fetchall() for item in t]
-        sql = 'SELECT WORD FROM {}'
-        await cursor.execute(sql.format("\"" + guild_id + "\""))
+        sql = 'SELECT WORD FROM guild_counters WHERE GUILD_ID=$1;'
+        await cursor.execute(sql, guild_id)
         word_strings = [item for t in await cursor.fetchall() for item in t]
-        sql = 'SELECT COUNT FROM {}'
-        await cursor.execute(sql.format("\"" + guild_id + "\""))
+        sql = 'SELECT COUNT FROM guild_counters WHERE GUILD_ID=$1;'
+        await cursor.execute(sql, guild_id)
         count_list = [item for t in await cursor.fetchall() for item in t]
-        check_row_template = 'SELECT count(*) as tot FROM {}'
-        await cursor.execute(check_row_template.format("\"" + guild_id + "\""))
+        check_row_template = 'SELECT count(*) as tot FROM guild_counters WHERE GUILD_ID=$1;'
+        await cursor.execute(check_row_template, guild_id)
         master_list = []
         for i in range(min(await cursor.fetchone())):
             master_list.append({"id": id_list[i], "word": word_strings[i], "regex": regex_strings[i],
@@ -101,8 +101,8 @@ class WordCounter(commands.Cog):
                                 if channel is not None:
                                     await channel.send(":trophy: Milestone reached! " + str(key["word"]) + " Count: " +
                                                        str(key["count"]))
-                        sql = 'UPDATE {} set COUNT = {} where ID = ?'
-                        await cursor.execute(sql.format("\"" + guild_id + "\"", key["count"]), (key["id"],))
+                        sql = 'UPDATE guild_counters SET COUNT=$1 where ID=$2'
+                        await cursor.execute(sql, key["count"], key["id"])
                         await self.client.db.commit()
         if message.author.id in SLEEPUSERS:
             if has_sleep(message.content):

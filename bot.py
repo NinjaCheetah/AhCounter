@@ -110,16 +110,14 @@ async def prepare_guild_settings():
     async with bot.db.cursor() as cursor:
         sql = '''
             CREATE TABLE IF NOT EXISTS guild_settings
-                (ID INTEGER PRIMARY KEY     AUTOINCREMENT,
-                GUILD_ID           INT    NOT NULL,
-                MILESTONE_CHANNEL           INT     NOT NULL)
+                (GUILD_ID BIGINT PRIMARY KEY,
+                MILESTONE_CHANNEL BIGINT);
         '''
         await cursor.execute(sql)
         sql = 'SELECT GUILD_ID FROM guild_settings'
         await cursor.execute(sql)
         guild_id_list = [item for t in await cursor.fetchall() for item in t]
-        bot_guilds = bot.guilds
-        for guild in bot_guilds:
+        for guild in bot.guilds:
             if guild.id not in guild_id_list:
                 sql = '''
                     INSERT INTO guild_settings 
@@ -132,27 +130,27 @@ async def prepare_guild_settings():
 
 async def prepare_tables():
     async with bot.db.cursor() as cursor:
-        bot_guilds = bot.guilds
-        for guild in bot_guilds:
+        for guild in bot.guilds:
             guild_id = '{}'.format(guild.id)
             sql = '''
-                CREATE TABLE IF NOT EXISTS{}
-                    (ID INTEGER PRIMARY KEY     AUTOINCREMENT,
-                    WORD           TEXT    NOT NULL,
-                    REGEX           TEXT     NOT NULL,
-                    COUNT        INT            NOT NULL)
+                CREATE TABLE IF NOT EXISTS guild_counters
+                    (ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    GUILD_ID BIGINT,
+                    WORD TEXT,
+                    REGEX TEXT,
+                    COUNT INT)
             '''
             await cursor.execute(sql.format("\"" + guild_id + "\""))
-            check_row_template = 'SELECT count(*) as tot FROM {}'
-            await cursor.execute(check_row_template.format("\"" + guild_id + "\""))
+            check_row_template = 'SELECT count(*) as tot FROM GUILD_COUNTERS WHERE guild_id=$1;'
+            await cursor.execute(check_row_template, guild_id)
             if not min(await cursor.fetchone()) > 0:
                 sql = '''
-                    INSERT INTO {} 
-                    (WORD,REGEX,COUNT) 
+                    INSERT INTO GUILD_COUNTERS 
+                    (GUILD_ID,WORD,REGEX,COUNT) 
                     VALUES 
-                    ('Ah', 'ah', 0 )
+                    ($1,'Ah', 'ah', 0 )
                 '''
-                await cursor.execute(sql.format("\""+guild_id+"\""))
+                await cursor.execute(sql, guild_id)
                 await bot.db.commit()
 
 
