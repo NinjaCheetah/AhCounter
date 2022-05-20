@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import discord
+import jishaku
 from discord.ext import commands
 import platform
 import sqlite3
@@ -55,12 +56,15 @@ class Help(commands.Cog):
     async def about(self, ctx):
         embed = discord.Embed(title="Ah Counter", color=0x00ff00)
         embed.set_author(name="About")
-        embed.add_field(name="Creator:", value="NinjaCheetah", inline=True)
-        embed.add_field(name=":globe_with_meridians: Website", value="https://ncxprogramming.com/programs/ahcounter",
-                        inline=True)
+        embed.add_field(name=":bust_in_silhouette: Creator:", value="NinjaCheetah", inline=True)
+        embed.add_field(name=":globe_with_meridians: Website", value="[ncxprogramming.com]"
+                             "(https://ncxprogramming.com/programs/ahcounter)", inline=True)
+        embed.add_field(name=":keyboard: Source:", value="[GitHub](https://github.com/NinjaCheetah/AhCounter)")
         embed.add_field(name=":snake: Python version:", value=platform.python_version(), inline=True)
         embed.add_field(name=":clipboard: Database:", value="SQLite "+sqlite3.sqlite_version, inline=True)
-        embed.add_field(name="Bot version:", value="v2.2", inline=False)
+        embed.add_field(name="Jishaku Version:", value=jishaku.__version__, inline=True)
+        embed.add_field(name="Bot version:", value="v2.2.1", inline=False)
+        embed.set_footer(text="Made with discord.py")
         await ctx.send(embed=embed)
 
 

@@ -20,6 +20,7 @@ import discord.utils
 import time
 import random
 
+import dbinit
 from config import BOT_MANAGERS
 
 banned_words = ["DELETE", "delete", "DROP", "drop", "\"", "\'"]
@@ -109,6 +110,14 @@ class Management(commands.Cog):
     async def shutdown(self, ctx):
         await ctx.send(":electric_plug: Shutting down...")
         await ctx.bot.logout()
+
+    @commands.command()
+    @commands.check(check_bot_manager)
+    async def checkdb(self, ctx):
+        message = await ctx.send("Re-initializing databases...")
+        await dbinit.prepare_guild_settings(self.bot)
+        await dbinit.prepare_tables(self.bot)
+        await message.edit(content="Re-initializing databases... :white_check_mark:")
 
     @app_commands.command()
     @app_commands.check(check_slash_perms)
