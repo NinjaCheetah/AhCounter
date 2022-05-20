@@ -53,6 +53,8 @@ async def on_command_error(ctx, error):
         await ctx.send(":x: There was an error while loading that extension.")
     if isinstance(error, commands.ExtensionNotFound):
         await ctx.send(":x: That extension could not be found!")
+    if isinstance(error, commands.CheckFailure):
+        await ctx.send(":x: You are missing the permissions required to run this command.")
 
 
 @bot.command(name='load', help='Loads an extension.')

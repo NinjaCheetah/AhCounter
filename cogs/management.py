@@ -24,9 +24,15 @@ from config import BOT_MANAGERS
 
 banned_words = ["DELETE", "delete", "DROP", "drop", "\"", "\'"]
 
+test = [5154352, 2453245435, 234534543]
+
 
 def check_slash_perms(interaction: discord.Interaction) -> bool:
     return interaction.user.id in BOT_MANAGERS or interaction.user.guild_permissions.manage_guild is True
+
+
+def check_bot_manager(ctx) -> bool:
+    return ctx.message.author.id in BOT_MANAGERS
 
 
 # noinspection DuplicatedCode
@@ -46,20 +52,20 @@ class Management(commands.Cog):
         await message.edit(content=f":ping_pong: Ping:  `{int(ping)}ms`")
 
     @commands.group(name='status', invoke_without_command=True)
-    @commands.is_owner()
+    @commands.check(check_bot_manager)
     async def status(self, ctx):
         await ctx.send(":x: Use `$status set <message>` to set status message, or if you are indecisive then "
                        "use `$status random`.")
 
     @status.command(aliases=['Set', 'set', '-s', '-S'])
-    @commands.is_owner()
+    @commands.check(check_bot_manager)
     async def presence_set(self, ctx, *, message):
         activity = discord.Game(name=message, type=3)
         await self.bot.change_presence(activity=activity)
         await ctx.send(":white_check_mark: Set status message to: `" + message + "`")
 
     @status.command(aliases=['Classic', 'classic', '-c'])
-    @commands.is_owner()
+    @commands.check(check_bot_manager)
     async def status_random_classic(self, ctx):
         status_list = [
             'Counting Ahs',
@@ -85,7 +91,7 @@ class Management(commands.Cog):
         await ctx.send(":white_check_mark: Set status to: `" + response + "`")
 
     @status.command(aliases=['Random', 'random', '-r'])
-    @commands.is_owner()
+    @commands.check(check_bot_manager)
     async def status_random(self, ctx):
         with open("words.txt", "r") as f:
             status_word_list = f.readlines()
@@ -99,7 +105,7 @@ class Management(commands.Cog):
         await ctx.send(":white_check_mark: Set status to: `" + status_string + "`")
 
     @commands.command()
-    @commands.is_owner()
+    @commands.check(check_bot_manager)
     async def shutdown(self, ctx):
         await ctx.send(":electric_plug: Shutting down...")
         await ctx.bot.logout()
