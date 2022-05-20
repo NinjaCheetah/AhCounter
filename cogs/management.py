@@ -22,7 +22,7 @@ import random
 
 from config import BOT_MANAGERS
 
-banned_words = ["DELETE", "delete", "DROP", "drop"]
+banned_words = ["DELETE", "delete", "DROP", "drop", "\"", "\'"]
 
 
 def check_slash_perms(interaction: discord.Interaction) -> bool:
