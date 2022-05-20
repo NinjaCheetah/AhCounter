@@ -110,7 +110,7 @@ class Management(commands.Cog):
         """Adds a new word to the database"""
         async with self.bot.db.cursor() as cursor:
             for banned_word in banned_words:
-                if banned_word in new_word or new_regex:
+                if banned_word in new_word or banned_word in new_regex:
                     await interaction.response.send_message(":warning: Sorry, that word/regex is not allowed.")
                     return
             guild_id = '{}'.format(interaction.guild.id)
