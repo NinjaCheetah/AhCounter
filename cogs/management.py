@@ -109,7 +109,7 @@ class Management(commands.Cog):
     @commands.check(check_bot_manager)
     async def shutdown(self, ctx):
         await ctx.send(":electric_plug: Shutting down...")
-        await ctx.bot.logout()
+        await self.bot.close()
 
     @commands.command()
     @commands.check(check_bot_manager)
