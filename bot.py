@@ -17,6 +17,7 @@ import asyncio
 import discord
 from discord.ext import commands
 import asqlite
+import logging
 
 import dbinit
 from config import CONFIG
@@ -39,23 +40,7 @@ intents = discord.Intents.all()
 bot = Bot(command_prefix='$', activity=discord.Game(name="Counting Ahs", type=3), intents=intents)
 bot.remove_command('help')
 
-startup_extensions = ["cogs.counter", "cogs.help", "cogs.management"]
-
-
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send(":x: You are missing a required argument!")
-    if isinstance(error, commands.ExtensionError):
-        await ctx.send(":x: That extension could not be found!")
-    if isinstance(error, commands.ExtensionNotLoaded):
-        await ctx.send(":x: There was an error while loading that extension.")
-    if isinstance(error, commands.ExtensionFailed):
-        await ctx.send(":x: There was an error while loading that extension.")
-    if isinstance(error, commands.ExtensionNotFound):
-        await ctx.send(":x: That extension could not be found!")
-    if isinstance(error, commands.CheckFailure):
-        await ctx.send(":x: You are missing the permissions required to run this command.")
+startup_extensions = ["cogs.counter", "cogs.help", "cogs.management", "cogs.events"]
 
 
 @bot.command(name='load', help='Loads an extension.')
@@ -67,6 +52,7 @@ async def load(ctx, extension):
     except Exception as e:
         exc = '{}: {}'.format(type(e).__name__, e)
         await ctx.send(":warning: Failed to load extension `{}`\n```\n{}\n```".format(extension, exc))
+        logging.error(exc)
 
 
 @bot.command(name='unload', help='Unloads an extension.')
@@ -85,6 +71,7 @@ async def reload(ctx, extension):
     except Exception as e:
         exc = '{}: {}'.format(type(e).__name__, e)
         await ctx.send(":warning: Failed to reload extension `{}`\n```\n{}\n```".format(extension, exc))
+        logging.error(exc)
 
 
 @bot.command(name='reloadall', help='Reloads all extensions.')
@@ -97,6 +84,7 @@ async def reloadall(ctx):
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             await ctx.send(":warning: Failed to reload extension `{}`\n```\n{}\n```".format(extension, exc))
+            logging.error(exc)
 
 
 async def load_extensions():
@@ -107,17 +95,24 @@ async def load_extensions():
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
+            logging.error(exc)
 
 
 @bot.event
 async def on_ready():
-    print('Ready.')
+    print("Ready!")
+    logging.info("Bot is ready!")
     await dbinit.prepare_tables(bot)
     await dbinit.prepare_guild_settings(bot)
     await bot.tree.sync()
 
 
 async def main():
+    logging.basicConfig(filename="bot.log",
+                        filemode='a',
+                        format='%(asctime)s.%(msecs)03d:%(name)s:%(levelname)s: %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S',
+                        level=logging.INFO)
     async with bot:
         bot.db = await asqlite.connect("counters.db")
         await load_extensions()

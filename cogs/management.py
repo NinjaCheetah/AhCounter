@@ -19,6 +19,7 @@ from discord.ext import commands
 import discord.utils
 import time
 import random
+import logging
 
 import dbinit
 from config import BOT_MANAGERS
@@ -108,6 +109,7 @@ class Management(commands.Cog):
     @commands.command()
     @commands.check(check_bot_manager)
     async def shutdown(self, ctx):
+        logging.warning("Bot is shutting down!")
         await ctx.send(":electric_plug: Shutting down...")
         await self.bot.close()
 
@@ -142,13 +144,15 @@ class Management(commands.Cog):
                 await cursor.execute(sql, guild_id, new_word, new_regex)
                 await interaction.response.send_message(":white_check_mark: Successfully added new word: `"
                                                         + new_word + "`, with regex: `" + new_regex + "`!")
+                logging.info("Added word \'%s\' with regex \'%s\' to guild \'%s\'", new_word, new_regex,
+                             interaction.guild.name)
             else:
                 await interaction.response.send_message(":warning: That word is already in the database!")
 
     @addword.error
     async def addword_err(self, interaction, error):
         await interaction.response.send_message(":warning: " + str(error) + " Please make sure you have the correct"
-                                                " permissions or are a bot manager.")
+                                                                            " permissions or are a bot manager.")
 
     @app_commands.command()
     @app_commands.check(check_slash_perms)
@@ -169,6 +173,7 @@ class Management(commands.Cog):
                 await self.bot.db.commit()
                 await interaction.response.send_message(":white_check_mark: Successfully removed word: `"
                                                         + word + "`!")
+                logging.info("Removed word \'%s\' from \'%s\'", word, interaction.guild.name)
             else:
                 await interaction.response.send_message(":warning: That word is not in the database!")
 
@@ -205,7 +210,7 @@ class Management(commands.Cog):
                 await self.bot.db.commit()
                 await interaction.response.send_message(":white_check_mark: Milestone channel set to `" +
                                                         channel_id.replace(" ", "") + "`! Messages will now "
-                                                        "be sent in the channel they're triggered from.")
+                                                                                      "be sent in the channel they're triggered from.")
             elif channel is None:
                 await interaction.response.send_message(":warning: That channel could not be found!")
             else:
@@ -213,6 +218,7 @@ class Management(commands.Cog):
                 await self.bot.db.commit()
                 await interaction.response.send_message(":white_check_mark: Milestone channel set to <#" +
                                                         channel_id.replace(" ", "") + ">!")
+            logging.info("Setting milestone channel for \'%s\' to %s", interaction.guild.name, channel_id_int)
 
     @set_milestone_channel.error
     async def set_milestone_channel_err(self, interaction, error):

@@ -13,6 +13,7 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import logging
 
 
 async def prepare_guild_settings(bot):
@@ -34,7 +35,8 @@ async def prepare_guild_settings(bot):
                     VALUES ($1, 0)
                 '''
                 await cursor.execute(sql, guild.id)
-        await bot.db.commit()
+                logging.info("Adding new guild to settings: %s", guild.name)
+                await bot.db.commit()
 
 
 async def prepare_tables(bot):
@@ -60,4 +62,5 @@ async def prepare_tables(bot):
                     ($1,'Ah', 'ah', 0 )
                 '''
                 await cursor.execute(sql, guild_id)
+                logging.info("Adding new guild to counters: %s", guild.name)
                 await bot.db.commit()
