@@ -11,5 +11,8 @@
             "ID": 0,
             "NAME": ""
         }
-    }
+    },
+    "BANNED_WORDS": [
+        "Example"
+    ]
 }

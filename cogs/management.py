@@ -20,11 +20,11 @@ import discord.utils
 import time
 import random
 import logging
+import re
 
 import dbinit
 from config import BOT_MANAGERS
-
-banned_words = ["DELETE", "delete", "DROP", "drop", "\"", "\'"]
+from config import BANNED_WORDS
 
 test = [5154352, 2453245435, 234534543]
 
@@ -126,8 +126,10 @@ class Management(commands.Cog):
     async def addword(self, interaction: discord.Interaction, new_word: str, new_regex: str):
         """Adds a new word to the database"""
         async with self.bot.db.cursor() as cursor:
-            for banned_word in banned_words:
-                if banned_word in new_word or banned_word in new_regex:
+            for banned_word in BANNED_WORDS:
+                if re.findall("\\b" + banned_word + "+\\b", new_word, re.IGNORECASE) or re.findall("\\b" + banned_word +
+                                                                                                   "+\\b", new_regex,
+                                                                                                   re.IGNORECASE):
                     await interaction.response.send_message(":warning: Sorry, that word/regex is not allowed.")
                     return
             guild_id = '{}'.format(interaction.guild.id)
@@ -159,8 +161,8 @@ class Management(commands.Cog):
     async def delword(self, interaction: discord.Interaction, word: str):
         """Removes a word from the database"""
         async with self.bot.db.cursor() as cursor:
-            for banned_word in banned_words:
-                if banned_word in word:
+            for banned_word in BANNED_WORDS:
+                if re.findall("\\b" + banned_word + "+\\b", word, re.IGNORECASE):
                     await interaction.response.send_message(":warning: Sorry, that input is not allowed.")
                     return
             guild_id = '{}'.format(interaction.guild.id)
@@ -187,10 +189,6 @@ class Management(commands.Cog):
     async def set_milestone_channel(self, interaction: discord.Interaction, channel_id: str):
         """Sets the milestone channel for the current server"""
         async with self.bot.db.cursor() as cursor:
-            for banned_word in banned_words:
-                if banned_word in channel_id:
-                    await interaction.response.send_message(":warning: Sorry, that input is not allowed.")
-                    return
             guild_id = '{}'.format(interaction.guild.id)
             try:
                 channel_id_int = int(channel_id.replace(" ", ""))
@@ -210,7 +208,8 @@ class Management(commands.Cog):
                 await self.bot.db.commit()
                 await interaction.response.send_message(":white_check_mark: Milestone channel set to `" +
                                                         channel_id.replace(" ", "") + "`! Messages will now "
-                                                                                      "be sent in the channel they're triggered from.")
+                                                                                      "be sent in the channel they're "
+                                                                                      "triggered from.")
             elif channel is None:
                 await interaction.response.send_message(":warning: That channel could not be found!")
             else:

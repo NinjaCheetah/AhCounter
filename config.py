@@ -14,6 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import json
+import logging
+
+logging.basicConfig(filename="bot.log",
+                    filemode='a',
+                    format='%(asctime)s.%(msecs)03d:%(name)s:%(levelname)s: %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    level=logging.INFO)
 
 
 def get_config():
@@ -35,7 +42,9 @@ def get_bot_managers():
         for key in CONFIG["BOT_MANAGERS"]:
             i = CONFIG["BOT_MANAGERS"][key]
             bot_managers.append(int(i["ID"]))
-    except KeyError:
+    except KeyError as e:
+        exc = '{}: {}'.format(type(e).__name__, e)
+        logging.warning(exc + ". No bot managers are configured.")
         bot_managers = [0]
     return bot_managers
 
@@ -50,8 +59,26 @@ def get_sleepusers():
             i = CONFIG["SLEEPUSERS"][key]
             sleepusers.append(int(i["ID"]))
         return sleepusers
-    except KeyError:
+    except KeyError as e:
+        exc = '{}: {}'.format(type(e).__name__, e)
+        logging.warning(exc + ". No sleep users are configured.")
         return [0]
 
 
 SLEEPUSERS = get_sleepusers()
+
+
+def get_banned_words():
+    banned_words = []
+    try:
+        for key in CONFIG["BANNED_WORDS"]:
+            banned_words.append(key)
+    except KeyError as e:
+        exc = '{}: {}'.format(type(e).__name__, e)
+        logging.warning(exc + ". No banned words are configured.")
+    banned_words.append("\"")
+    banned_words.append("\"")
+    return banned_words
+
+
+BANNED_WORDS = get_banned_words()
