@@ -23,10 +23,9 @@ import logging
 import re
 
 import dbinit
+from config import CONFIG
 from config import BOT_MANAGERS
 from config import BANNED_WORDS
-
-test = [5154352, 2453245435, 234534543]
 
 
 def check_slash_perms(interaction: discord.Interaction) -> bool:
@@ -198,7 +197,7 @@ class Management(commands.Cog):
             channel = self.bot.get_channel(channel_id_int)
             sql = 'UPDATE guild_settings SET MILESTONE_CHANNEL=$1 where GUILD_ID=$2;'
             if channel_id_int == 0:
-                await cursor.execute(sql.format, channel_id_int, guild_id)
+                await cursor.execute(sql, channel_id_int, guild_id)
                 await self.bot.db.commit()
                 await interaction.response.send_message(":white_check_mark: Milestone channel set to `" +
                                                         channel_id.replace(" ", "") + "`! Messages are now "
@@ -223,6 +222,19 @@ class Management(commands.Cog):
     async def set_milestone_channel_err(self, interaction, error):
         await interaction.response.send_message(":warning: " + str(error) + " Please make sure you have the correct"
                                                                             " permissions or are a bot manager.")
+
+    @commands.command(name='invite')
+    async def invite(self, ctx):
+        try:
+            invite_url = CONFIG["INVITE"]
+        except KeyError:
+            logging.warning("Missing key 'INVITE' in config file!")
+            await ctx.send("Sorry, this instance has no public invite link.")
+            return
+        if invite_url:
+            await ctx.send("Invite me to your server using this link: " + invite_url)
+        else:
+            await ctx.send("Sorry, this instance has no public invite link.")
 
 
 async def setup(bot):
