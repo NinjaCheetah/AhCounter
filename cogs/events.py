@@ -15,6 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from discord.ext import commands
 import logging
+import traceback
 
 import dbinit
 
@@ -31,16 +32,18 @@ class Events(commands.Cog):
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(":x: You are missing a required argument!")
-        if isinstance(error, commands.ExtensionError):
+        elif isinstance(error, commands.ExtensionNotFound):
             await ctx.send(":x: That extension could not be found!")
-        if isinstance(error, commands.ExtensionNotLoaded):
-            await ctx.send(":x: There was an error while loading that extension.")
-        if isinstance(error, commands.ExtensionFailed):
-            await ctx.send(":x: There was an error while loading that extension.")
-        if isinstance(error, commands.ExtensionNotFound):
-            await ctx.send(":x: That extension could not be found!")
-        if isinstance(error, commands.CheckFailure):
+        elif isinstance(error, commands.CheckFailure):
             await ctx.send(":x: You are missing the permissions required to run this command.")
+        else:
+            if not isinstance(error, commands.CommandNotFound):
+                etype = type(error)
+                trace = error.__traceback__
+                lines = traceback.format_exception(etype, error, trace)
+                traceback_text = ''.join(lines)
+                await ctx.send(":no_entry: An error has occurred.\n```\n" + traceback_text + "```\n")
+                logging.error(traceback_text)
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
