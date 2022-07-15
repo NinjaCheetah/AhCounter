@@ -18632,12 +18632,7 @@ fades
 fading
 fads
 faecal
-faeces
-fag
-faggot
-faggots
-fagot
-fags
+faece
 fail
 failed
 failing
@@ -52640,7 +52635,6 @@ trance
 trances
 tranche
 tranches
-tranny
 tranquil
 tranquillise
 tranquillised
