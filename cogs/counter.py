@@ -13,7 +13,9 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import discord
 from discord.ext import commands
+from discord import app_commands
 import re
 import unidecode
 
@@ -111,6 +113,21 @@ class WordCounter(commands.Cog):
                 for i in sleepwords:
                     if re.findall("\\b" + str(i) + "\\b", message.content, re.IGNORECASE):
                         await message.add_reaction("🧢")
+
+    @app_commands.command()
+    async def countword(self, interaction: discord.Interaction, word: str):
+        """Gets the count of a specific word"""
+        master_list = await build_master_list(self.client, interaction.guild_id)
+        word_list = []
+        count = 0
+        for key in master_list:
+            word_list.append(key["word"])
+            if word in key["word"]:
+                count = key["count"]
+        if word in word_list:
+            await interaction.response.send_message("Count for word \"" + word + "\": " + str(count))
+        else:
+            await interaction.response.send_message(":warning: That word is not in the database!")
 
 
 async def setup(client):
