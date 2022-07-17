@@ -135,7 +135,10 @@ class Management(commands.Cog):
             sql = 'SELECT WORD FROM guild_counters WHERE GUILD_ID=$1;'
             await cursor.execute(sql, guild_id)
             word_list = [item for t in await cursor.fetchall() for item in t]
-            if new_word not in word_list:
+            for checked_word in word_list:
+                if new_word.casefold() == checked_word.casefold():
+                    await interaction.response.send_message(":warning: That word is already in the database!")
+            else:
                 sql = '''
                     INSERT INTO guild_counters 
                     (GUILD_ID,WORD,REGEX,COUNT)
@@ -147,8 +150,6 @@ class Management(commands.Cog):
                                                         + new_word + "`, with regex: `" + new_regex + "`!")
                 logging.info("Added word \'%s\' with regex \'%s\' to guild \'%s\'", new_word, new_regex,
                              interaction.guild.name)
-            else:
-                await interaction.response.send_message(":warning: That word is already in the database!")
 
     @addword.error
     async def addword_err(self, interaction, error):
@@ -168,13 +169,14 @@ class Management(commands.Cog):
             sql = 'SELECT WORD FROM guild_counters WHERE GUILD_ID=$1;'
             await cursor.execute(sql, guild_id)
             word_list = [item for t in await cursor.fetchall() for item in t]
-            if word in word_list:
-                sql = 'DELETE FROM guild_counters WHERE GUILD_ID=$1 AND WORD=$2;'
-                await cursor.execute(sql, guild_id, word)
-                await self.bot.db.commit()
-                await interaction.response.send_message(":white_check_mark: Successfully removed word: `"
-                                                        + word + "`!")
-                logging.info("Removed word \'%s\' from \'%s\'", word, interaction.guild.name)
+            for checked_word in word_list:
+                if word.casefold() == checked_word.casefold():
+                    sql = 'DELETE FROM guild_counters WHERE GUILD_ID=$1 AND WORD=$2;'
+                    await cursor.execute(sql, guild_id, checked_word)
+                    await self.bot.db.commit()
+                    await interaction.response.send_message(":white_check_mark: Successfully removed word: `"
+                                                            + checked_word + "`!")
+                    logging.info("Removed word \'%s\' from \'%s\'", checked_word, interaction.guild.name)
             else:
                 await interaction.response.send_message(":warning: That word is not in the database!")
 

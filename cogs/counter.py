@@ -120,12 +120,14 @@ class WordCounter(commands.Cog):
         master_list = await build_master_list(self.client, interaction.guild_id)
         word_list = []
         count = 0
+        original_word = ""
         for key in master_list:
-            word_list.append(key["word"])
-            if word in key["word"]:
+            word_list.append(key["word"].casefold())
+            if word.casefold() in key["word"].casefold():
                 count = key["count"]
-        if word in word_list:
-            await interaction.response.send_message("Count for word \"" + word + "\": " + str(count))
+                original_word = key["word"]
+        if word.casefold() in word_list:
+            await interaction.response.send_message("Count for word \"" + original_word + "\": " + str(count))
         else:
             await interaction.response.send_message(":warning: That word is not in the database!")
 
