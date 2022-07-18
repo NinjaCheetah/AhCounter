@@ -138,6 +138,7 @@ class Management(commands.Cog):
             for checked_word in word_list:
                 if new_word.casefold() == checked_word.casefold():
                     await interaction.response.send_message(":warning: That word is already in the database!")
+                    return
             else:
                 sql = '''
                     INSERT INTO guild_counters 
@@ -177,6 +178,7 @@ class Management(commands.Cog):
                     await interaction.response.send_message(":white_check_mark: Successfully removed word: `"
                                                             + checked_word + "`!")
                     logging.info("Removed word \'%s\' from \'%s\'", checked_word, interaction.guild.name)
+                    return
             else:
                 await interaction.response.send_message(":warning: That word is not in the database!")
 
