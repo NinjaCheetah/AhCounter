@@ -16,6 +16,7 @@
 import discord
 import jishaku
 from discord.ext import commands
+from discord import app_commands
 import platform
 import sqlite3
 
@@ -30,12 +31,15 @@ class Help(commands.Cog):
 
     @commands.group(name='help', help='Shows this message', invoke_without_command=True)
     async def help(self, ctx):
-        embed = discord.Embed(title="Ah Counter Commands", color=0xffff00)
+        embed = discord.Embed(title="Ah Counter Commands", color=0x9702C5)
         embed.set_author(name="Ah Counter Help")
-        embed.add_field(name="about", value="Shows info about the bot.", inline=False)
-        embed.add_field(name="count", value="Shows the counts for all words.", inline=False)
-        embed.add_field(name="milestones", value="Shows the milestones that count messages are sent at.", inline=False)
-        embed.set_footer(text="Prefix is `$`")
+        embed.add_field(name="`$about`", value="Shows info about the bot.", inline=False)
+        embed.add_field(name="`$count`", value="Shows the counts for all words.", inline=False)
+        embed.add_field(name="`/count <word>`", value="Shows the count of the specified word.", inline=False)
+        embed.add_field(name="`$invite`", value="Shows the invite link for this instance, if available.", inline=False)
+        embed.add_field(name="`$milestones`", value="Shows the milestones that count messages are sent at.",
+                        inline=False)
+        embed.set_footer(text="Looking for configuration commands? Try /config_help.")
         await ctx.send(embed=embed)
 
     @commands.group(name='ownerhelp', help='Shows this message', invoke_without_command=True)
@@ -66,6 +70,20 @@ class Help(commands.Cog):
         embed.add_field(name="Bot version:", value="v2.2.4", inline=False)
         embed.set_footer(text="Made with discord.py")
         await ctx.send(embed=embed)
+
+    @app_commands.command()
+    async def config_help(self, interaction=discord.Interaction):
+        """Shows how to configure Ah Counter"""
+        embed = discord.Embed(title="Ah Counter Configuration", color=0x280697)
+        embed.set_author(name="Config Help")
+        embed.add_field(name="`/addword <word> <regex>`", value="Adds a new word that will be counted and the regex"
+                        " that will be used to detect it.", inline=False)
+        embed.add_field(name="`/delword <word>`", value="Deletes the specified word and stops it from being counted."
+                        " This cannot be undone!", inline=False)
+        embed.add_field(name="`/set_milestone_channel`", value="Specify a channel for milestone messages to be sent to"
+                        " using its channel ID. You can also set `0` to disable milestone messages, or `1` to send them"
+                        " to the channel they were triggered from.", inline=False)
+        await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot):
