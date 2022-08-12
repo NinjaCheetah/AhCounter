@@ -89,7 +89,7 @@ class WordCounter(commands.Cog):
                 guild_id = '{}'.format(message.guild.id)
                 master_list = await build_master_list(self.client, guild_id)
                 for key in master_list:
-                    if re.findall("\\b" + str(key["regex"]) + "+\\b", message.content, re.IGNORECASE):
+                    if re.findall("\\b" + str(key["regex"]) + ".*\\b", message.content, re.IGNORECASE):
                         key["count"] += 1
                         if key["count"] in milestones:
                             await cursor.execute('SELECT MILESTONE_CHANNEL FROM guild_settings WHERE GUILD_ID == ?',

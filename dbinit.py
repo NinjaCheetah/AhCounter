@@ -59,7 +59,7 @@ async def prepare_tables(bot):
                     INSERT INTO GUILD_COUNTERS 
                     (GUILD_ID,WORD,REGEX,COUNT) 
                     VALUES 
-                    ($1,'Ah', 'ah', 0 )
+                    ($1,'Ah', 'ah+', 0 )
                 '''
                 await cursor.execute(sql, guild_id)
                 logging.info("Adding new guild to counters: %s", guild.name)
