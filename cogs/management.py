@@ -122,7 +122,7 @@ class Management(commands.Cog):
 
     @app_commands.command()
     @app_commands.check(check_slash_perms)
-    async def addword(self, interaction: discord.Interaction, new_word: str, new_regex: str):
+    async def addword(self, interaction: discord.Interaction, new_word: str, new_regex: str, word_bound: bool = True):
         """Adds a new word to the database"""
         async with self.bot.db.cursor() as cursor:
             for banned_word in BANNED_WORDS:
@@ -142,11 +142,11 @@ class Management(commands.Cog):
             else:
                 sql = '''
                     INSERT INTO guild_counters 
-                    (GUILD_ID,WORD,REGEX,COUNT)
+                    (GUILD_ID,WORD,REGEX,COUNT,WORDBOUND)
                     VALUES 
-                    ($1, $2, $3, 0)
+                    ($1, $2, $3, 0, $4)
                 '''
-                await cursor.execute(sql, guild_id, new_word, new_regex)
+                await cursor.execute(sql, guild_id, new_word, new_regex, word_bound)
                 await interaction.response.send_message(":white_check_mark: Successfully added new word: `"
                                                         + new_word + "`, with regex: `" + new_regex + "`!")
                 logging.info("Added word \'%s\' with regex \'%s\' to guild \'%s\'", new_word, new_regex,

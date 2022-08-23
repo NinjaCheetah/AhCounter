@@ -49,7 +49,8 @@ async def prepare_tables(bot):
                     GUILD_ID BIGINT,
                     WORD TEXT,
                     REGEX TEXT,
-                    COUNT INT)
+                    COUNT INT,
+                    WORDBOUND BOOL)
             '''
             await cursor.execute(sql.format("\"" + guild_id + "\""))
             check_row_template = 'SELECT count(*) as tot FROM GUILD_COUNTERS WHERE guild_id=$1;'
@@ -57,9 +58,9 @@ async def prepare_tables(bot):
             if not min(await cursor.fetchone()) > 0:
                 sql = '''
                     INSERT INTO GUILD_COUNTERS 
-                    (GUILD_ID,WORD,REGEX,COUNT) 
+                    (GUILD_ID,WORD,REGEX,COUNT,WORDBOUND) 
                     VALUES 
-                    ($1,'Ah', 'ah+', 0 )
+                    ($1,'Ah', 'ah+', 0 , TRUE)
                 '''
                 await cursor.execute(sql, guild_id)
                 logging.info("Adding new guild to counters: %s", guild.name)

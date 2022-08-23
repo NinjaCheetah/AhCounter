@@ -50,12 +50,15 @@ async def build_master_list(client, guild_id):
         sql = 'SELECT COUNT FROM guild_counters WHERE GUILD_ID=$1;'
         await cursor.execute(sql, guild_id)
         count_list = [item for t in await cursor.fetchall() for item in t]
+        sql = 'SELECT WORDBOUND FROM guild_counters WHERE GUILD_ID=$1'
+        await cursor.execute(sql, guild_id)
+        use_bounds = [item for t in await cursor.fetchall() for item in t]
         check_row_template = 'SELECT count(*) as tot FROM guild_counters WHERE GUILD_ID=$1;'
         await cursor.execute(check_row_template, guild_id)
         master_list = []
         for i in range(min(await cursor.fetchone())):
             master_list.append({"id": id_list[i], "word": word_strings[i], "regex": regex_strings[i],
-                                "count": count_list[i]})
+                                "count": count_list[i], "use_bounds": use_bounds[i]})
     return master_list
 
 
@@ -89,7 +92,11 @@ class WordCounter(commands.Cog):
                 guild_id = '{}'.format(message.guild.id)
                 master_list = await build_master_list(self.client, guild_id)
                 for key in master_list:
-                    if re.findall("\\b" + str(key["regex"]) + ".*\\b", message.content, re.IGNORECASE):
+                    if key["use_bounds"] is True:
+                        regex_bounds = ["", ""]
+                    else:
+                        regex_bounds = ["\\b", ".*\\b"]
+                    if re.findall(regex_bounds[0] + str(key["regex"]) + regex_bounds[1], message.content, re.IGNORECASE):
                         key["count"] += 1
                         if key["count"] in milestones:
                             await cursor.execute('SELECT MILESTONE_CHANNEL FROM guild_settings WHERE GUILD_ID == ?',
