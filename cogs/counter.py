@@ -92,7 +92,7 @@ class WordCounter(commands.Cog):
                 guild_id = '{}'.format(message.guild.id)
                 master_list = await build_master_list(self.client, guild_id)
                 for key in master_list:
-                    if key["use_bounds"] is True:
+                    if not key["use_bounds"]:
                         regex_bounds = ["", ""]
                     else:
                         regex_bounds = ["\\b", ".*\\b"]
