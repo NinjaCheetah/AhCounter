@@ -67,7 +67,7 @@ class Help(commands.Cog):
         embed.add_field(name=":snake: Python version:", value=platform.python_version(), inline=True)
         embed.add_field(name=":clipboard: Database:", value="SQLite "+sqlite3.sqlite_version, inline=True)
         embed.add_field(name="Jishaku Version:", value=jishaku.__version__, inline=True)
-        embed.add_field(name="Bot version:", value="v2.2.4", inline=False)
+        embed.add_field(name="Bot version:", value="v2.3.0", inline=False)
         embed.set_footer(text="Made with discord.py")
         await ctx.send(embed=embed)
 

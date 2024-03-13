@@ -17,23 +17,9 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import re
-import unidecode
-
-from config import SLEEPUSERS
 
 milestones = [10, 25, 50, 75, 100, 150, 200, 300, 400, 500, 1000, 1500, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000,
-              10000, 11000, 12000, 13000, 14000, 15000, 20000]
-sleepwords = ["tired", "bed", "rest"]
-SLEEP_REGEX = [".?[s5xz\u0455]+.?.?[l1|]+.?.?[e3\u0435\u0395]+.?.?[e3\u0435\u0395]+.?.?[p\u0440\u03A1].?",
-               ".?01010011.?01101100.?01100101.?01100101.?0111000.?"]
-
-
-def has_sleep(string):
-    match = re.search(SLEEP_REGEX[0], string, flags=re.IGNORECASE)
-    if not match:
-        string = unidecode.unidecode(string)
-        match = re.search(SLEEP_REGEX[0], string, flags=re.IGNORECASE)
-    return match
+              10000, 11000, 12000, 13000, 14000, 15000, 20000, 25000, 50000, 75000, 100000, 150000, 200000, 250000]
 
 
 async def build_master_list(client, guild_id):
@@ -113,13 +99,6 @@ class WordCounter(commands.Cog):
                         sql = 'UPDATE guild_counters SET COUNT=$1 where ID=$2'
                         await cursor.execute(sql, key["count"], key["id"])
                         await self.client.db.commit()
-        if message.author.id in SLEEPUSERS:
-            if has_sleep(message.content):
-                await message.add_reaction("🧢")
-            else:
-                for i in sleepwords:
-                    if re.findall("\\b" + str(i) + "\\b", message.content, re.IGNORECASE):
-                        await message.add_reaction("🧢")
 
     @app_commands.command()
     async def countword(self, interaction: discord.Interaction, word: str):

@@ -52,22 +52,6 @@ def get_bot_managers():
 BOT_MANAGERS = get_bot_managers()
 
 
-def get_sleepusers():
-    sleepusers = []
-    try:
-        for key in CONFIG["SLEEPUSERS"]:
-            i = CONFIG["SLEEPUSERS"][key]
-            sleepusers.append(int(i["ID"]))
-        return sleepusers
-    except KeyError as e:
-        exc = '{}: {}'.format(type(e).__name__, e)
-        logging.warning(exc + ". No sleep users are configured.")
-        return [0]
-
-
-SLEEPUSERS = get_sleepusers()
-
-
 def get_banned_words():
     banned_words = []
     try:
