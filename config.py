@@ -1,5 +1,5 @@
 # Ah Counter "config.py"
-# Copyright (C) 2022  NinjaCheetah
+# Copyright (C) 2022-2025 NinjaCheetah
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,8 +13,13 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import json
 import logging
+
+
+BOT_VERSION = "3.0.0"
+
 
 logging.basicConfig(filename="bot.log",
                     filemode='a',

@@ -1,5 +1,5 @@
 # Ah Counter "counter.py"
-# Copyright (C) 2022  NinjaCheetah
+# Copyright (C) 2022-2025 NinjaCheetah
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,34 +13,37 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import discord
-from discord.ext import commands
-from discord import app_commands
+
 import re
 
-milestones = [10, 25, 50, 75, 100, 150, 200, 300, 400, 500, 1000, 1500, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000,
+import discord
+from discord import app_commands
+from discord.ext import commands
+
+
+MILESTONES = [10, 25, 50, 75, 100, 150, 200, 300, 400, 500, 1000, 1500, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000,
               10000, 11000, 12000, 13000, 14000, 15000, 20000, 25000, 50000, 75000, 100000, 150000, 200000, 250000]
 
 
 async def build_master_list(client, guild_id):
     async with client.db.cursor() as cursor:
-        sql = 'SELECT ID FROM guild_counters WHERE GUILD_ID=$1;'
-        await cursor.execute(sql, guild_id)
+        sql = 'SELECT ID FROM guild_counters WHERE GUILD_ID=?;'
+        await cursor.execute(sql, (guild_id,))
         id_list = [item for t in await cursor.fetchall() for item in t]
-        sql = 'SELECT REGEX FROM guild_counters WHERE GUILD_ID=$1;'
-        await cursor.execute(sql, guild_id)
+        sql = 'SELECT REGEX FROM guild_counters WHERE GUILD_ID=?;'
+        await cursor.execute(sql, (guild_id,))
         regex_strings = [item for t in await cursor.fetchall() for item in t]
-        sql = 'SELECT WORD FROM guild_counters WHERE GUILD_ID=$1;'
-        await cursor.execute(sql, guild_id)
+        sql = 'SELECT WORD FROM guild_counters WHERE GUILD_ID=?;'
+        await cursor.execute(sql, (guild_id,))
         word_strings = [item for t in await cursor.fetchall() for item in t]
-        sql = 'SELECT COUNT FROM guild_counters WHERE GUILD_ID=$1;'
-        await cursor.execute(sql, guild_id)
+        sql = 'SELECT COUNT FROM guild_counters WHERE GUILD_ID=?;'
+        await cursor.execute(sql, (guild_id,))
         count_list = [item for t in await cursor.fetchall() for item in t]
-        sql = 'SELECT WORDBOUND FROM guild_counters WHERE GUILD_ID=$1'
-        await cursor.execute(sql, guild_id)
+        sql = 'SELECT WORDBOUND FROM guild_counters WHERE GUILD_ID=?'
+        await cursor.execute(sql, (guild_id,))
         use_bounds = [item for t in await cursor.fetchall() for item in t]
-        check_row_template = 'SELECT count(*) as tot FROM guild_counters WHERE GUILD_ID=$1;'
-        await cursor.execute(check_row_template, guild_id)
+        check_row_template = 'SELECT count(*) as tot FROM guild_counters WHERE GUILD_ID=?;'
+        await cursor.execute(check_row_template, (guild_id,))
         master_list = []
         for i in range(min(await cursor.fetchone())):
             master_list.append({"id": id_list[i], "word": word_strings[i], "regex": regex_strings[i],
@@ -58,25 +61,22 @@ class WordCounter(commands.Cog):
 
     @commands.command(name='count', help='Displays the counts from all word counters.')
     async def countall(self, message):
-        guild_id = '{}'.format(message.guild.id)
-        master_list = await build_master_list(self.client, guild_id)
+        master_list = await build_master_list(self.client, message.guild.id)
         wordcounts = ""
         await message.channel.send("**Counting all the words!**")
         for key in master_list:
-            wordcounts += "" + str(key["word"]) + " Count: " + str(key["count"]) + "\n"
+            wordcounts += f"{key["word"]} Count: {key["count"]}\n"
         await message.channel.send(wordcounts)
 
     @commands.command(name='milestones')
     async def milestones(self, ctx):
-        await ctx.send(
-            "Milestones: `" + str(milestones) + "`\nMessage format: :trophy: Milestone reached! <word> Count: <count>")
+        await ctx.send(f"Milestones: `{MILESTONES}`\nMessage format: :trophy: Milestone reached! <word> Count: <count>")
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.guild is not None and message.author.id != 737755242757881937:
+        if message.guild is not None and message.author.id != 742827192362205267:
             async with self.client.db.cursor() as cursor:
-                guild_id = '{}'.format(message.guild.id)
-                master_list = await build_master_list(self.client, guild_id)
+                master_list = await build_master_list(self.client, message.guild.id)
                 for key in master_list:
                     if not key["use_bounds"]:
                         regex_bounds = ["", ""]
@@ -84,9 +84,9 @@ class WordCounter(commands.Cog):
                         regex_bounds = ["\\b", ".*\\b"]
                     if re.findall(regex_bounds[0] + str(key["regex"]) + regex_bounds[1], message.content, re.IGNORECASE):
                         key["count"] += 1
-                        if key["count"] in milestones:
+                        if key["count"] in MILESTONES:
                             await cursor.execute('SELECT MILESTONE_CHANNEL FROM guild_settings WHERE GUILD_ID == ?',
-                                                 message.guild.id)
+                                                 (message.guild.id,))
                             milestone_channel_id = int(max([item for t in await cursor.fetchall() for item in t]))
                             if milestone_channel_id == 1:
                                 await message.channel.send(
@@ -96,8 +96,8 @@ class WordCounter(commands.Cog):
                                 if channel is not None:
                                     await channel.send(":trophy: Milestone reached! " + str(key["word"]) + " Count: " +
                                                        str(key["count"]))
-                        sql = 'UPDATE guild_counters SET COUNT=$1 where ID=$2'
-                        await cursor.execute(sql, key["count"], key["id"])
+                        sql = 'UPDATE guild_counters SET COUNT=? where ID=?'
+                        await cursor.execute(sql, (key["count"], key["id"]))
                         await self.client.db.commit()
 
     @app_commands.command()
@@ -113,7 +113,7 @@ class WordCounter(commands.Cog):
                 count = key["count"]
                 original_word = key["word"]
         if word.casefold() in word_list:
-            await interaction.response.send_message("Count for word \"" + original_word + "\": " + str(count))
+            await interaction.response.send_message(f"Count for word \"{original_word}\": {count}")
         else:
             await interaction.response.send_message(":warning: That word is not in the database!")
 

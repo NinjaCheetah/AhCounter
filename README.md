@@ -2,7 +2,9 @@
 # Ah Counter
 A customizable Discord bot for counting words (such as "Ah"!) 
 
-Want to just use the public instance? You can find that [here](https://discord.com/api/oauth2/authorize?client_id=737755242757881937&permissions=277025508416&scope=applications.commands%20bot)!
+Want to use the public instance? You can find that [here](https://discord.com/api/oauth2/authorize?client_id=737755242757881937&permissions=277025508416&scope=applications.commands%20bot)!
+
+As of December 2025, Ah Counter is tested and working on Python 3.14.2 with up-to-date discord.py and aiosqlite.
 
 ## Running
 To run this bot, you'll first need to set up a `config.json` file in the bot's root directory. Instructions on how to do this can be found on [the wiki](https://github.com/NinjaCheetah/AhCounter/wiki), and an example config file is provided.

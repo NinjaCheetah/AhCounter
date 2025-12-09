@@ -1,5 +1,5 @@
 # Ah Counter "dbinit.py"
-# Copyright (C) 2022  NinjaCheetah
+# Copyright (C) 2022-2025 NinjaCheetah
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,6 +13,7 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import logging
 
 
@@ -32,9 +33,9 @@ async def prepare_guild_settings(bot):
                 sql = '''
                     INSERT INTO guild_settings 
                     (GUILD_ID,MILESTONE_CHANNEL)
-                    VALUES ($1, 0)
+                    VALUES (?, 0)
                 '''
-                await cursor.execute(sql, guild.id)
+                await cursor.execute(sql, (guild.id,))
                 logging.info("Adding new guild to settings: %s", guild.name)
                 await bot.db.commit()
 
@@ -42,7 +43,6 @@ async def prepare_guild_settings(bot):
 async def prepare_tables(bot):
     async with bot.db.cursor() as cursor:
         for guild in bot.guilds:
-            guild_id = '{}'.format(guild.id)
             sql = '''
                 CREATE TABLE IF NOT EXISTS guild_counters
                     (ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -52,16 +52,16 @@ async def prepare_tables(bot):
                     COUNT INT,
                     WORDBOUND BOOL)
             '''
-            await cursor.execute(sql.format("\"" + guild_id + "\""))
-            check_row_template = 'SELECT count(*) as tot FROM GUILD_COUNTERS WHERE guild_id=$1;'
-            await cursor.execute(check_row_template, guild_id)
+            await cursor.execute(sql)
+            check_row_template = 'SELECT count(*) as tot FROM GUILD_COUNTERS WHERE guild_id=?;'
+            await cursor.execute(check_row_template, (guild.id,))
             if not min(await cursor.fetchone()) > 0:
                 sql = '''
                     INSERT INTO GUILD_COUNTERS 
                     (GUILD_ID,WORD,REGEX,COUNT,WORDBOUND) 
                     VALUES 
-                    ($1,'Ah', 'ah+', 0 , TRUE)
+                    (?, 'Ah', 'ah+', 0 , TRUE)
                 '''
-                await cursor.execute(sql, guild_id)
+                await cursor.execute(sql, (guild.id,))
                 logging.info("Adding new guild to counters: %s", guild.name)
                 await bot.db.commit()

@@ -1,5 +1,5 @@
 # Ah Counter "event.py"
-# Copyright (C) 2022  NinjaCheetah
+# Copyright (C) 2022-2025 NinjaCheetah
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,9 +13,11 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from discord.ext import commands
+
 import logging
 import traceback
+
+from discord.ext import commands
 
 import dbinit
 
@@ -42,7 +44,7 @@ class Events(commands.Cog):
                 trace = error.__traceback__
                 lines = traceback.format_exception(etype, error, trace)
                 traceback_text = ''.join(lines)
-                await ctx.send(":no_entry: An error has occurred.\n```\n" + traceback_text + "```\n")
+                await ctx.send(":no_entry: An error has occurred.\n```\n{traceback_text}```\n")
                 logging.error(traceback_text)
 
     @commands.Cog.listener()

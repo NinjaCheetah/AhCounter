@@ -1,5 +1,5 @@
 # Ah Counter "help.py"
-# Copyright (C) 2022  NinjaCheetah
+# Copyright (C) 2022-2025 NinjaCheetah
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,12 +13,16 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import discord
-import jishaku
-from discord.ext import commands
-from discord import app_commands
+
 import platform
 import sqlite3
+
+import discord
+from discord import app_commands
+from discord.ext import commands
+import jishaku
+
+from config import BOT_VERSION
 
 
 class Help(commands.Cog):
@@ -42,13 +46,10 @@ class Help(commands.Cog):
         embed.set_footer(text="Looking for configuration commands? Try /config_help.")
         await ctx.send(embed=embed)
 
-    @commands.group(name='ownerhelp', help='Shows this message', invoke_without_command=True)
+    @commands.group(name='admin', help='Shows this message', invoke_without_command=True)
     async def secrethelp(self, ctx):
-        embed = discord.Embed(title="Owner-Only Management Commands", color=0xff0000)
-        embed.set_author(name="Owner Help")
-        embed.add_field(name="status",
-                        value="Use `$status set <message>` to set a status or `$status random` to pick a random one",
-                        inline=False)
+        embed = discord.Embed(title="Admin Management Commands", color=0xff0000)
+        embed.set_author(name="Admin Help")
         embed.add_field(name="load", value="Loads a cog", inline=True)
         embed.add_field(name="unload", value="Unloads a cog", inline=True)
         embed.add_field(name="reload", value="Reloads a cog", inline=True)
@@ -58,16 +59,16 @@ class Help(commands.Cog):
 
     @commands.command(name="about")
     async def about(self, ctx):
-        embed = discord.Embed(title="Ah Counter", color=0x00ff00)
+        embed = discord.Embed(title="Ah Counter", color=0x9702C5)
         embed.set_author(name="About")
         embed.add_field(name=":bust_in_silhouette: Creator:", value="NinjaCheetah", inline=True)
         embed.add_field(name=":globe_with_meridians: Website", value="[ncxprogramming.com]"
                              "(https://ncxprogramming.com/programs/ahcounter)", inline=True)
         embed.add_field(name=":keyboard: Source:", value="[GitHub](https://github.com/NinjaCheetah/AhCounter)")
         embed.add_field(name=":snake: Python version:", value=platform.python_version(), inline=True)
-        embed.add_field(name=":clipboard: Database:", value="SQLite "+sqlite3.sqlite_version, inline=True)
+        embed.add_field(name=":clipboard: Database:", value=f"SQLite {sqlite3.sqlite_version}", inline=True)
         embed.add_field(name="Jishaku Version:", value=jishaku.__version__, inline=True)
-        embed.add_field(name="Bot version:", value="v2.3.0", inline=False)
+        embed.add_field(name="Bot version:", value=f"v{BOT_VERSION}", inline=False)
         embed.set_footer(text="Made with discord.py")
         await ctx.send(embed=embed)
 
