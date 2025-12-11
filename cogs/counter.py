@@ -74,7 +74,7 @@ class WordCounter(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.guild is not None and message.author.id != 742827192362205267:
+        if message.guild is not None and message.author.id != self.client.user.id:
             async with self.client.db.cursor() as cursor:
                 master_list = await build_master_list(self.client, message.guild.id)
                 for key in master_list:
